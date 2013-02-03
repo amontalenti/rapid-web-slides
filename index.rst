@@ -435,6 +435,26 @@ We'll start with the navigation area and header.
 
 We'll then add a simple listing of fake links in a table.
 
+What have we learned?
+---------------------
+
+HTML isn't that hard.
+
+With Bootstrap, you don't need to be a designer to get from wireframe to
+clickable.
+
+Problems:
+
+* app is not very interactive
+* list of links hard-coded
+
+Adding Interactivity
+--------------------
+
+Enter jQuery.
+
+Let's play in the Chrome Inspector console with the jQuery API.
+
 Baby Turtles
 ------------
 
