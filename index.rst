@@ -455,6 +455,13 @@ Enter jQuery.
 
 Let's play in the Chrome Inspector console with the jQuery API.
 
+Chrome Inspector
+----------------
+
+* Console
+* Elements
+* Network
+
 Baby Turtles
 ------------
 
