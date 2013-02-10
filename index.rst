@@ -106,9 +106,9 @@ Computer Science Backend Bias
 
 .. class:: incremental
 
-    Myth: The most interesting problems in computing are algorithmic and backend systems
-    oriented: e.g. data structures, natural language processing, operating systems,
-    distributed systems, cryptography.
+    Myth: The most interesting problems in computing are algorithmic and
+    backend systems oriented: e.g. data structures, natural language
+    processing, operating systems, distributed systems, cryptography.
 
     Reality: These are simply the most interesting problems to introverted CS
     PhDs. The most widely used software is not solving fundamental computing
@@ -120,7 +120,8 @@ Fear of Unskilled Design Bias
 
 .. class:: incremental
 
-    Myth: Only a trained graphic designer can create usable and functional user interfaces.
+    Myth: Only a trained graphic designer can create usable and functional user
+    interfaces.
 
     Reality: Anyone can create these interfaces; a skilled designer will
     promote these interfaces from the kind you merely use daily to the kind you
@@ -150,11 +151,11 @@ Polyglot Complexity Bias
     language, JavaScript, HTML, and CSS. That's messy; I prefer to simply code
     in Java, Ruby, Python, etc.
 
-    Reality: The web is messy, but all that's necessary to build a web app 
-    is some basic knowledge of JavaScript and HTML. Much of the rest can 
-    be abstracted via modern toolkits like jQuery and Bootstrap. You also
-    need a way to render that JavaScript/HTML code, but this isn't as tough 
-    as it seems.
+    Reality: This is partially true. The web is messy, but all that's necessary
+    to build a web app is some basic knowledge of JavaScript and HTML. Much of
+    the rest can be abstracted via modern toolkits like jQuery and Bootstrap.
+    You also need a way to render that JavaScript/HTML code, but this isn't as
+    tough as it seems.
 
 Beat the Backend Bias Back!
 ---------------------------
@@ -167,7 +168,7 @@ The typical Python software engineer has no problem with:
 * writing a testing a database schema
 * implementing pure Python classes / functions
 * thinking about scale and performance
-* writing a program with a command-line interface
+* building a command-line interface
 
 This is a kind of "comfort zone" for typical programmers.
 
@@ -177,8 +178,8 @@ Free From Frontend Fear?
 Same engineers exhibit a real fear when confronted with:
 
 * creating hand-drawn or digital wireframes
-* prototyping entire UIs that are backend-free but clickable
-* testing out a user interface concept in isolation
+* prototyping entire clickable user interfaces
+* experimenting with a user interface concept in isolation
 * testing variations of a user interface on a live population
 
 I'm not really concerned with why this split exists, but I definitely observe
@@ -214,26 +215,47 @@ through three phases of rapid web prototyping:
 
     * "Ship It!": add a database and deployment, store your first data
 
-Why Fake?
----------
+Why Fake? (1)
+-------------
 
 Traditional software process:
 
-1. Someone has an idea
-2. Idea elaborated into "Requirements Document"
-3. Requirements enriched with Wireframes (optional, "product lead")
-4. Wireframes enriched into Mockup (optional, "design lead")
-5. Backend engineer builds Requirements into API, database schema, or somesuch
-6. Frontend engineer builds Mockup into user interface
-7. Some engineer "wires frontend to backend"
-8. Feature is tested on users
-9. Feedback from users leads to bug reports / revisions / rewrites
+.. class:: incremental
 
-Problem: between steps 1 and 9, MONTHS can pass.
+    1. Someone has an idea
 
-Related problem: when building fundamentally new & innovative products, step 9
-is the most important since you're mainly looking for feedback & idea
-validation.
+    2. Idea elaborated into "Requirements Document"
+
+    3. Requirements enriched with Wireframes (optional, "product lead")
+
+    4. Wireframes enriched into Mockup (optional, "design lead")
+
+    5. Backend engineer builds Requirements into API, database schema, or somesuch
+
+Why Fake? (2)
+-------------
+
+.. class:: incremental
+
+
+    6. Frontend engineer builds Mockup into user interface
+
+    7. Some engineer "wires frontend to backend"
+
+    8. Feature is tested on users
+
+    9. Feedback from users leads to bug reports / revisions / rewrites
+
+
+Why Fake? (3)
+-------------
+
+.. class:: incremental
+
+    Problem: between steps 1 and 9, MONTHS can pass.
+
+    Related problem: when building fundamentally new & innovative products,
+    step 9 (feedback from real users) is the most important.
 
 First Fake
 ----------
@@ -251,7 +273,7 @@ Light Bulb
 
 .. class:: incremental
 
-    I have an idea: "Reddit for clickstreams!"
+    Idea: "Reddit for clickstreams!"
 
     Reddit is cool, but the explicit "voting" process is annoying.
 
@@ -265,16 +287,18 @@ Light Bulb
 Now What?
 ---------
 
-Do you start building a database? ``Frontpage``, ``Article``, and ``Link``
-classes w/ ORM bindings? Hell, no!
+.. class:: incremental
 
-Do you start researching high-concurrency web frameworks for your millions of
-potential users? Screw that!
+    Do you start building a database? ``Frontpage``, ``Article``, and ``Link``
+    classes w/ ORM bindings? Hell, no!
 
-Do you write a really detailed requirements document and complicated technical
-architecture? What good will that do!?
+    Do you start researching high-concurrency web frameworks for your millions of
+    potential users? Screw that!
 
-Let's **prototype** this idea.
+    Do you write a really detailed requirements document and complicated technical
+    architecture? What good will that do!?
+
+    Let's **prototype** this idea.
 
 Pen and Paper
 -------------
@@ -284,15 +308,26 @@ using the old pen and paper.
 
 Quick discussion about wireframes:
 
-* hand-drawn vs digital
-* low-fidelity vs high-fidelity
-* information, heirarchy, flow
+.. class:: incremental
+
+    * hand-drawn vs digital
+
+    * low-fidelity vs high-fidelity
+
+    * information, heirarchy, flow
+
+Goal of Sketch
+--------------
 
 Answer key questions:
 
-* what does she see?
-* what can she do?
-* why does she care?
+.. class:: incremental
+
+    * what does she see?
+
+    * what can she do?
+      
+    * why does she care?
 
 Wireframe share session
 -----------------------
@@ -459,8 +494,498 @@ Chrome Inspector
 ----------------
 
 * Console
+* Sources
 * Elements
 * Network
+
+First Visit Experience
+----------------------
+
+Use browser cookie to detect whether user has visited before.
+
+Show a modal dialog on first visit to explain concept, and then hide it on
+future visits.
+
+Static file limitations
+-----------------------
+
+When first prototyping, the easiest approach is "pure static" -- just open your
+HTML file in your browser.
+
+This has some limitations though:
+
+* cookies don't work
+* localStorage doesn't work
+* referencing static JSON/CSV files doesn't work
+* relative links won't work
+
+Python SimpleHTTPServer
+-----------------------
+
+Here is our first "Python backend".
+
+A simple HTTP web server built into Python itself.
+
+Just run:
+
+.. sourcecode:: sh
+
+    cd static
+    python -m SimpleHTTPServer
+
+Now open http://localhost:8000 in your browser.
+
+Bootstrap Modal HTML
+--------------------
+
+.. sourcecode:: html
+
+    <div id="first-visit-dialog" class="modal hide fade in">
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal">×</a>
+            <h3>Welcome to Rapid News!</h3>
+        </div>
+        <div class="modal-body">
+            <h4>Rapid News connects you with the latest links</h4>
+            <p>Links are prioritized on this page based on clicks and
+            submits. Simply click a link or submit a story and you're 
+            instantly a part of the community.</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn" data-dismiss="modal">Close</a>
+        </div>
+    </div> 
+
+Scripting the Modal
+-------------------
+
+.. sourcecode:: javascript
+
+    function showFirstVisitDialog() {
+        var cookie = RAPID.readCookie("visited");
+        if (cookie === "true") {
+            // do nothing, user has visited before
+            return;
+        }
+        var modal = $("#first-visit-dialog");
+        modal.on("hide", function() {
+            RAPID.createCookie("visited", "true", 30);
+        });
+        modal.modal();
+    };
+
+Building a small API
+--------------------
+
+Console and state.
+
+.. image:: img/js_object.png
+    :align: center
+
+Use a JSON-P API with jQuery
+----------------------------
+
+.. sourcecode:: html
+
+    http://hndroidapi.appspot.com
+        /best/format/json/page/
+            ?appid=RAPID&
+            callback=
+
+.. sourcecode:: javascript
+
+    var apiroot = "http://hndroidapi.appspot.com";
+    var path = "/best/format/json/page/";
+    var params = "?appid=RAPID&callback=?";
+    var url = [apiroot, path, params].join("");
+
+    $.getJSON(url, function(data) {
+        $.each(data.items, function(i, item) {
+            console.log(item.title);
+        });
+        console.dir(data);
+    });
+
+Dynamic Element Modification
+----------------------------
+
+.. sourcecode:: javascript
+
+    $.getJSON(url, function(data) {
+        var rows = $("table tr");
+        $.each(data.items, function(i, item) {
+            var row = rows.get(i+1);
+            if (typeof row !== "undefined") {
+                row = $(row);
+                var score = row.find("span.label:first");
+                var pubdate = row.find("span.label:last");
+                var link = row.find("a");
+                link.attr("href", item.url);
+                link.html(item.title);
+                score.html(item.score.replace(" points", ""));
+                pubdate.html(item.time);
+            }
+        });
+    });
+
+Implementing the Submit Page
+----------------------------
+
+* what she sees: a form for submitting content
+* why she cares: share a story with the community
+
+Copypasta time!
+
+Review Template
+---------------
+
+.. sourcecode:: html
+
+    <html>
+        <head>
+            <meta charset="utf-8">
+            <title>RN: Submit News</title>
+            <!-- ... -->
+        </head>
+        <body>
+            <div class="container">
+                <!-- <bootstrap> -->
+
+                <!-- </bootstrap> -->
+            </div>
+
+            <script src="js/lib/jquery.js"></script>
+            <script src="js/lib/bootstrap.js"></script>
+            <script>window.RAPID = {};</script>
+            <script src="js/submit.js"></script>
+        </body>
+    </html>
+
+Link Wiring
+-----------
+
+On main page:
+
+.. sourcecode:: html
+
+    <ul class="nav">
+        <li><a href="#">Links</a></li>
+        <li class="active"><a href="/submit.html">Submit</a></li>
+    </ul>
+
+On submit page:
+
+.. sourcecode:: html
+
+    <ul class="nav">
+        <li><a href="/">Links</a></li>
+        <li class="active"><a href="#">Submit</a></li>
+    </ul>
+
+Create a Form
+-------------
+
+.. sourcecode:: html
+
+    <div id="submit-form">
+        <form action="/new">
+            <fieldset>
+                <legend>Submit some news!</legend>
+                <label>Link</label>
+                <input type="text" placeholder="http://...">
+                <label>Title</label>
+                <input type="text" placeholder="news headline or description">
+                <div class="control-group">
+                    <button type="submit" class="btn">Submit!</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+
+Reviewing the Carnage
+---------------------
+
+.. class:: incremental
+
+    Two pages: ``index.html`` and ``submit.html``.
+
+    Using several Bootstrap components: navigation, table, form, modal.
+
+    JSON-P API calls to some fake data and jQuery for element manipulation.
+
+    Still no backend built.
+
+    Can be used to gather useful user feedback.
+
+What's Missing from our Prototype?
+----------------------------------
+
+.. class:: incremental
+
+    No server means no way to handle the submit form.
+
+    No way to track clicks (no link redirector).
+
+    No real scoring algorithm yet (data faked from HN).
+
+What's Wrong with Our Prototype?
+--------------------------------
+
+.. class:: incremental
+
+    Nothing! With very little code, we're providing a clickable UI.
+
+    De-risking some of our core assumptions about the product.
+
+    However, we can already see some code duplications (header/footer, nav).
+
+    Starting to hit the limits of no backend.
+
+    Time for Python to save the day!
+
+Onward to "Getting Real!"
+-------------------------
+
+Let's take a 5m break to answer questions / reflect a bit.
+
+IPython and Flask installation
+------------------------------
+
+.. sourcecode:: sh
+
+    $ cat requirements.txt
+    ipython
+    Flask
+    $ pip install -r requirements.txt
+    ...
+
+Then...
+
+.. sourcecode:: sh
+
+    $ ipython
+    >>> import flask
+    >>> flask.<TAB>
+    >>> import jinja2
+    >>> jinja2.<TAB>
+    >>> import werkzeug
+    >>> werkzeug.<TAB>
+
+Advanced Prototyping
+--------------------
+
+If you install some optional requirements, you can get:
+
+* IPython Notebook: browser-based Python editor and prototyping environmnet
+* LiveReload: browser plugin and server for auto reloading on page changes
+
+.. sourcecode:: sh
+
+    $ cat dev-requirements
+    # for live code updates
+    livereload
+    # for ipython notebook
+    tornado
+    pyzmq
+    $ pip install -r dev-requirements.txt
+    ...
+    $ ipython notebook
+    $ livereload -p 8000
+
+Build a Web Server
+------------------
+
+.. sourcecode:: python
+
+    from werkzeug.wrappers import Request, Response
+
+    @Request.application
+    def app(request):
+        print request.path
+        print request.headers
+        return Response("hello, world!")
+
+    from werkzeug.serving import run_simple
+    run_simple("localhost", 4000, app)
+
+Debug a Web Server
+------------------
+
+.. sourcecode:: python
+
+    from werkzeug.wrappers import Request, Response
+    from werkzeug.debug import DebuggedApplication
+
+    @Request.application
+    def app(request):
+        raise ValueError("testing debugger")
+        return Response("hello, world!")
+
+    app = DebuggedApplication(app, evalex=True)
+
+    from werkzeug.serving import run_simple
+    run_simple("localhost", 4000, app)
+
+Inspecting the Request
+----------------------
+
+.. sourcecode:: python
+
+    >>> request.headers
+    EnvironHeaders([('Cookie', 'csrftoken=ETXzOTz6zqbQYt0o...
+    >>> request.headers.keys()
+    ['Cookie', 'Content-Length', 'Accept-Charset', 'User-Agent', 
+    'Connection', 'Host', 'Cache-Control', 'Accept', 'Accept-Language', 
+    'Content-Type', 'Accept-Encoding']
+    >>> request.headers["User-Agent"]
+    'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.17 (KHTML, like Gecko)'
+    'Chrome/24.0.1312.68 Safari/537.17'  
+ 
+Inspecting the Request from Chrome
+----------------------------------
+
+We can look at both sides of this request to really understand it.
+
+Flask "microframework" overview
+-------------------------------
+
+* Werkzeug provides the web server and HTTP utility libraries
+* Jinja2 provides the templating language
+* Flask wires these two together conveniently
+
+Why do we need a programmable web server?
+-----------------------------------------
+
+To do anything "dynamic" in response to user requests.
+
+For our Rapid News app, we need the server to:
+
+* validate the news submission form
+* store recently submitted stories
+* calculate the scoring algorithm
+* implement a link redirector (for tracking clicks)
+* implement keyword search
+
+Why do we need a templating language?
+-------------------------------------
+
+Remember copypasta?
+
+.. class:: incremental
+
+    We want to avoid duplicating code between ``index.html`` and
+    ``submit.html``.  As this app grows, we may add new pages, and 
+    we'd like to maintain a common look-and-feel (template heirarchy).
+
+    We want to render pages "dynamically" using data we've stored on the
+    server (control flow and interpolation).
+
+    We want to enable HTML code re-use within pages (macros).
+
+Template Example
+----------------
+
+.. sourcecode:: python
+
+    from jinja2 import Template
+
+    tmpl = Template(u'''
+    <table>
+    <tr>
+        <td><strong>Number</strong></td>
+        <td><strong>Square</strong></td>
+    </tr>
+    {%- for item in rows %}
+    <tr>
+        <td>{{ item.number }}</td>
+        <td>{{ item.square }}</td>
+    </tr>
+    {%- endfor %}
+    <table>
+    ''')
+
+    data = [{"number": number, "square": number*number} 
+                for number in range(10)]
+    print tmpl.render(rows=data)
+
+Template Output
+---------------
+
+.. sourcecode:: html
+
+    <table>
+    <tr>
+        <td><strong>Number</strong></td>
+        <td><strong>Square</strong></td>
+    </tr>
+        ...
+    <tr>
+        <td>3</td>
+        <td>9</td>
+    </tr>
+    <tr>
+        <td>4</td>
+        <td>16</td>
+    </tr>
+        ...
+    <tr>
+        <td>9</td>
+        <td>81</td>
+    </tr>
+    <table>
+
+Template Loaders
+----------------
+
+.. sourcecode:: python
+
+    import os
+    import sys
+    from json import load
+    from jinja2 import Environment, FileSystemLoader
+
+    env = Environment(loader=FileSystemLoader(os.getcwd()))
+    data = load(open(sys.argv[2]))
+    print env.get_template(sys.argv[1]).render(data)
+
+Template Tester
+---------------
+
+.. sourcecode:: sh
+
+    $ python render.py squares.jinja2.html
+    {"rows": {"number": 3, "square": 9}
+    <table>
+    <tr>
+        <td><strong>Number</strong></td>
+        <td><strong>Square</strong></td>
+    </tr>
+    <tr>
+        <td>3</td>
+        <td>9</td>
+    </tr>
+    </table>
+
+
+Flask App Structure
+-------------------
+
+.. sourcecode:: python
+
+    from flask import (Flask, render_template, request)
+    from rapid import query_articles
+
+    app = Flask(__name__)
+
+    @app.route('/')
+    def index():
+        articles = query_articles()
+        return render_template('index.jinja2.html',
+                            articles=articles)
+
+    if __name__ == "__main__":
+        app.run(debug=True)
+
 
 Baby Turtles
 ------------
