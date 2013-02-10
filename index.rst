@@ -889,16 +889,13 @@ Template Example
 
     from jinja2 import Template
 
-    tmpl = Template(u'''
-    <table>
+    tmpl = Template(u'''<table>
     <tr>
-        <td><strong>Number</strong></td>
-        <td><strong>Square</strong></td>
+        <td><strong>Number</strong></td> <td><strong>Square</strong></td>
     </tr>
     {%- for item in rows %}
     <tr>
-        <td>{{ item.number }}</td>
-        <td>{{ item.square }}</td>
+        <td>{{ item.number }}</td> <td>{{ item.square }}</td>
     </tr>
     {%- endfor %}
     <table>
@@ -941,12 +938,33 @@ Template Loaders
 
     import os
     import sys
-    from json import load
+    import json
     from jinja2 import Environment, FileSystemLoader
 
+    args = sys.argv
     env = Environment(loader=FileSystemLoader(os.getcwd()))
-    data = load(open(sys.argv[2]))
-    print env.get_template(sys.argv[1]).render(data)
+    data = json.load(open(args[2]))
+    print env.get_template(args[1]).render(data)
+
+Template as File
+----------------
+
+.. sourcecode:: jinja
+
+    <table>
+        <tr>
+            <td><strong>Number</strong></td>
+            <td><strong>Square</strong></td>
+        </tr>
+        {%- for item in rows %}
+            <tr>
+                <td>{{ item.number }}</td>
+                <td>{{ item.square }}</td>
+            </tr>
+        {%- endfor %}
+    <table>
+
+Saved in ``squares.jinja2.html``.
 
 Template Tester
 ---------------
@@ -954,7 +972,7 @@ Template Tester
 .. sourcecode:: sh
 
     $ python render.py squares.jinja2.html
-    {"rows": {"number": 3, "square": 9}
+    {"rows": [{"number": 3, "square": 9}]}
     <table>
     <tr>
         <td><strong>Number</strong></td>
@@ -966,26 +984,49 @@ Template Tester
     </tr>
     </table>
 
+Data Access Stub
+----------------
+
+.. sourcecode:: python
+
+    def top_articles():
+        return []
+
+    def search_articles(query):
+        return []
+
+    def insert_article(article):
+        return False
 
 Flask App Structure
 -------------------
 
 .. sourcecode:: python
 
-    from flask import (Flask, render_template, request)
-    from rapid import query_articles
+    from flask import Flask, render_template
+    from rapid import top_articles 
 
     app = Flask(__name__)
 
     @app.route('/')
     def index():
-        articles = query_articles()
+        articles = top_articles()
         return render_template('index.jinja2.html',
-                            articles=articles)
+                               articles=articles)
 
     if __name__ == "__main__":
         app.run(debug=True)
 
+Flask Goodies
+-------------
+
+* request "context"
+* URL routing
+* sessions
+* redirects
+* template "context"
+* app configuration
+* filesystem handling
 
 Baby Turtles
 ------------
