@@ -1022,11 +1022,408 @@ Flask Goodies
 
 * request "context"
 * URL routing
+* template "context"
 * sessions
 * redirects
-* template "context"
 * app configuration
 * filesystem handling
+
+Request Context (1)
+-------------------
+
+.. class:: incremental
+
+    In plain Python code, you tend to avoid global state like the plague.
+
+    In web applications, there is some implicit global state: the currently
+    running "application", and the currently-being-handled "request".
+
+    Flask makes dealing with these easier than it would otherwise be.
+
+Request Context (2)
+-------------------
+
+.. sourcecode:: python
+
+    app = Flask(__name__)
+    # the "application context"
+
+
+... and...
+
+.. sourcecode:: python
+
+    from flask import request
+
+    @app.route('/')
+    def index():
+        # the "request context"
+        print request.headers
+
+Handling Shared State
+---------------------
+
+.. class:: incremental
+
+    Core Idea: your Python functions / classes get "bound to a context".
+
+    Flask calls your code and sets appropriate shared state (e.g. current
+    request via ``flask.request`` and the current session via ``flask.session``).
+
+    You can also share arbitrary data in-process via ``flask.g`` (global).
+
+Code Coupling
+-------------
+
+In this way, Flask makes coupling between your code and the web server very explicit.
+
+(Insight: Flask can create a "thin web layer" for plain Python code.)
+
+URL Routing
+-----------
+
+.. class:: incremental
+
+    URL Routing lets you bind HTTP paths and arguments to Python functions easily.
+
+    This is the "design of your URLs".
+
+    Let's look at an example of Flickr's URL design.
+
+URL Routing at Flickr
+---------------------
+
+.. sourcecode:: python
+
+    @app.route("/explore")
+    def explore_photos():
+        pass
+
+    @app.route("/photos")
+    def most_recent_photos():
+        pass
+
+    @app.route("/photos/<username>")
+    def user_photos(username):
+        pass
+
+    @app.route("/photos/<username>/<int:photo_id>")
+    def photo_detail(username, photo_id):
+        pass
+
+URL Routing with Rapid News
+---------------------------
+
+.. sourcecode:: python
+
+    @app.route('/')
+    def index():
+        pass
+
+    @app.route('/search/<query>')
+    def search(query):
+        pass
+
+    @app.route('/submit', methods=["GET", "POST"])
+    def submit():
+        pass
+
+Porting Static Design to Templates
+----------------------------------
+
+.. sourcecode:: jinja
+
+    {# example layout.html #}    
+    {# header #}
+    <html>
+        <head>
+            <title>{% block title %}{% endblock %}</title>
+        </head>
+        <body>
+    {# /header #}
+            {% block body %}
+            {% endblock %}
+    {# footer #}
+        </body>
+    </html>
+    {# /footer #}
+
+Simplified Index Template
+-------------------------
+
+.. sourcecode:: jinja
+
+    {# example index.html #}
+    {% extends 'layout.html' %}
+    {% block title %}Latest News{% endblock %}
+    {% block body %}
+        <table>
+            <thead>
+                ...
+            </thead>
+            <tbody>
+                ....
+            </tbody>
+        </table>
+    {% endblock %}
+
+Simplified Submit Template
+--------------------------
+
+.. sourcecode:: jinja
+
+    {# example submit.html #}
+    {% extends 'layout.html' %}
+    {% block title %}Submit News{% endblock %}
+    {% block body %}
+        <form>
+            <fieldset>
+                ...
+            </fieldset>
+        </form>
+    {% endblock %}
+
+Static Code Generation
+----------------------
+
+.. sourcecode:: sh
+
+    $ cd templates
+    $ python render.py index.jinja2.html data.json
+    <html>
+    ...
+        <table>
+    ...
+    </html>
+    $ python render.py submit.jinja2.html data.json
+    <html>
+    ...
+        <form>
+    ...
+    </html>
+
+Template Context (1)
+--------------------
+
+.. class:: incremental
+
+    In the ``render.py`` calls from before, data.json was a file with an empty JSON object.
+
+    {}
+
+    We can populate variables in here to create a "template context".
+
+Template Context (2)
+--------------------
+
+.. sourcecode:: javascript
+
+    {"rows": 
+        [
+            {"title": "Google", 
+             "score": 150, 
+             "link": "http://google.com"},
+            {"title": "Yahoo", 
+             "score": 75, 
+             "link": "http://yahoo.com"},
+            {"title": "Bing", 
+             "score": 50, 
+             "link": "http://bing.com"}
+        ]
+    }
+
+
+Template Context (3)
+--------------------
+
+.. sourcecode:: jinja
+
+    {% for row in rows %}
+    <tr>
+        <td>{{ row.score }}</td>
+        <td><a href="{{ row.link }}">{{ row.title }}</a></td>
+        <td>just now</td>
+    </tr>
+    {% endfor %}
+
+Template Context (4)
+--------------------
+
+.. sourcecode:: sh
+
+    $ python render.py index.jinja2.html articles.json
+
+.. sourcecode:: html
+
+    <html>
+        ...
+    <body>
+        ...
+            <tr>
+                <td>150</td>
+                <td><a href="http://google.com">Google</a></td>
+                <td>just now</td>
+            </tr>
+        ...
+        </body>
+    </html>
+
+Wire Templates to Flask
+-----------------------
+
+.. sourcecode:: python
+
+    from flask import render_template, Flask
+    app = Flask(__name__)
+
+    def top_articles():
+        articles = [
+            {"title": "Google", "score": 150, "link": "http://google.com"},
+            {"title": "Yahoo", "score": 75, "link": "http://yahoo.com"},
+            {"title": "Bing", "score": 50, "link": "http://bing.com"}
+        ]
+        return articles
+
+    @app.route('/')
+    def index():
+        articles = top_articles()
+        return render_template("index.jinja2.html", rows=articles)
+
+    if __name__ == "__main__":
+        app.run(debug=True)
+
+Frontend / Backend Recap
+------------------------
+
+Backend:
+
+* browser makes request to specific URL
+* Flask server routes URL to appropriate view function
+* "does something useful" during request context
+* stashes results into template context
+
+Frontend:
+
+* server renders HTML / JavaScript in response to request
+* rendering happens within a "template context", via Jinja2
+* template context provides "dynamic" data from server
+* JavaScript executed within client browser, after page rendering
+
+Simplified Backend thru Frontend
+--------------------------------
+
+.. sourcecode:: text
+
+    Browser Request 
+        --> WSGI Server 
+            --> Flask App Context
+                --> View Function 
+                    --> Request Context
+                        --> Python Code / Data Access
+                    --> Template Context
+                        --> Render Template
+            --> Response to Browser
+    Browser Response Parsing 
+        --> Download & Parse CSS / JavaScript
+        --> Render DOM
+        --> Execute JavaScript
+            --> Register Event Handlers
+            --> Remote Requests (AJAX)
+            --> Dynamic Element Modification
+        --> Full Page Loaded
+
+What Goes Where?
+----------------
+
+.. class:: incremental
+
+    This request/response lifecycle is what makes web programming a little complex.
+
+    Paradox of choice re: where to put your logic.
+
+    Should core logic be in the browser (JavaScript), templates (Jinja2), in
+    the request context (Flask) or just on the server (plain Python)?
+
+    The answer is, "it depends".
+
+Single Page Apps
+----------------
+
+.. class:: incremental
+
+    There has been a bit of a craze recently about "single-page web apps".
+
+    The idea is that for many web apps, almost all of the application logic can
+    live in the browser.
+
+    The server only speaks an API (HTTP/JSON) and does not do things like
+    template rendering.
+
+    Proponents of this approach say that it makes the applications more
+    performant and unifies the codebase (mostly JavaScript).
+
+    JavaScript interpreters in modern browsers are fast enough for this now,
+    whereas in e.g. 2004-2008, this would have been infeasible.
+
+Multi-Page Apps
+---------------
+
+.. class:: incremental
+
+    Multi-page apps tend to be more "web-friendly".
+
+    They also tend to be simpler to implement and debug.
+
+    Easy to selectively use single-page app techniques in a multi-page app.
+
+    Original "AJAX" craze was about this.
+
+
+Rapid News As Single-Page
+-------------------------
+
+.. sourcecode:: text
+
+    Browser Request to '/'
+        --> Flask Renders Static HTML
+        --> Flask Returns Static JavaScript Application 
+    Browser Response
+        --> jQuery API call to /frontpage.json
+            --> New Flask Request
+                --> Python Logic to get top articles
+            --> Data Rendered as JSON
+        --> API data used to template/render client-side
+    User Sees Front Page
+    User Clicks "Submit"
+        --> JavaScript alters DOM
+    User Sees Submit Form
+    User Submits New Article
+        --> jQuery API call to /submit.json for validation
+    User Sees Validation Errors or Success
+
+Rapid News as Multi-Page
+------------------------
+
+.. sourcecode:: text
+
+    Browser Request to '/'
+        --> New Flask Request
+            --> Python Logic to get Top Articles
+        --> New Template Context with Data
+            --> Template Rendered with Jinja2
+    Browser Response
+    User Sees Front Page
+    User Clicks "Submit"
+        --> New Flask Request
+        --> New (Empty) Template Context for Submission Form
+            --> Template Rendered with Jinja2
+    User Sees Submit Form
+    User Submits New Article
+        --> New Flask Request
+            --> Python Form Validation Logic
+        --> New Template Context with Errors (or Empty)
+            --> Template Rendered with Jinja2
+    User Sees Validation Errors or Success
 
 Baby Turtles
 ------------
