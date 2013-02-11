@@ -29,7 +29,7 @@ The tutorial will be accessible both to programming novices and existing
 programmers.
 
 Python, HTML, and JavaScript will be used -- and some experience with these
-will be necessary -- but specific knowledge with these technologies is not
+will be helpful -- but specific knowledge with these technologies is not
 required to get a lot of value out of this course.
 
 The only pre-requisite is a little familiarity with Github, git, and the
@@ -38,6 +38,9 @@ command-line. You can learn these using Github's official documentation:
 1. Learn Git: http://learn.github.com/p/intro.html
 2. Git Bootcamp: https://help.github.com/categories/54/articles
 3. Using Git: https://help.github.com/categories/19/articles
+
+Alternatively, you can show up an hour early for the course and the instructor
+will help you get a local Git-based development environment set up.
 
 This tutorial will have a "hands-on lab" feeling, where everyone follows along
 with code on their computer using a Github repo I've set up, and when people
