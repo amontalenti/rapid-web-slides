@@ -1425,6 +1425,159 @@ Rapid News as Multi-Page
             --> Template Rendered with Jinja2
     User Sees Validation Errors or Success
 
+Convert All The Pages
+---------------------
+
+Let's take some time to go from v1.0-app to v1.1-jinja.
+
+Macros
+------
+
+.. sourcecode:: jinja
+
+    {%- macro link_tag(location) -%}
+        <link rel="stylesheet" href="static/css/{{ location }}.css">
+    {%- endmacro -%}
+
+    {%- macro script_tag(location) -%}
+        <script src="static/js/{{ location }}.js"></script>
+    {%- endmacro -%}
+
+Macro Imports (1)
+-----------------
+
+.. sourcecode:: jinja
+
+    {# layout.jinja2.html #}
+
+    {% from 'util.jinja2.html' import link_tag, script_tag %}
+        ...
+        <head>
+            <title>(RN) {% block title %}{% endblock %}</title>
+
+            {{ link_tag('lib/bootstrap') }}
+            {{ link_tag('lib/bootstrap-responsive') }}
+
+            {% block css %}
+            {% endblock %}
+        </head>
+        <body>
+        ...
+
+Macro Imports (2)
+-----------------
+
+.. sourcecode:: jinja
+
+    {% from 'util.jinja2.html' import link_tag, script_tag %}
+    ...
+
+    {{ script_tag('lib/jquery') }}
+    {{ script_tag('lib/bootstrap') }}
+    <script>window.RAPID = {};</script>
+
+    {% block js %}
+    {% endblock %}
+
+Using Static Assets
+-------------------
+
+.. sourcecode:: python
+
+    app = Flask(__name__, 
+                static_folder="../static", 
+                static_url_path="/static")
+
+Will now look in "../static" and serve all static files there under "/static"
+URL, thus matching our macros.
+
+New Template Layout
+-------------------
+
+.. sourcecode:: jinja
+
+    {% extends 'layout.jinja2.html' %}
+
+    {% block title %}My Page{% endblock %}
+
+    {% block css %}
+            {{ link_tag('my-page') }}
+    {% endblock %}
+
+    {% block body %}
+            <div class="my-page"></div>
+    {% endblock %}
+
+    {% block js %}
+            {{ script_tag('my-page') }}
+    {% endblock %}
+
+
+Using Macros for Forms
+----------------------
+
+.. sourcecode:: jinja
+
+    <div id="submit-form">
+        <h2>Submit a new article!</h2>
+
+        <form method="POST">
+            <fieldset>
+                {{ input("link", "Link", placeholder="http://...") }}
+                {{ input("title", "Title", placeholder="headline or description") }}
+                <div class="form-actions">
+                    {{ button("Submit") }}
+            </fieldset>
+        </form>
+    </div>
+
+Error Handling
+--------------
+
+.. sourcecode:: jinja
+
+    {% macro error(name) -%}
+        {% if errors and errors[name] -%}
+            error
+        {% endif -%}
+    {% endmacro -%}
+
+    {% macro errorhelp(name) -%}
+        {% if errors and errors[name] -%}
+            <span class="help-inline">{{ errors[name] }}</span>
+        {% endif -%}
+    {% endmacro -%}
+
+Input Component
+---------------
+
+.. sourcecode:: jinja
+
+    {% macro input(name, desc, type='text', placeholder=None) -%}
+        <div class="control-group {{ error(name) }}">
+            <label class="control-label" for="{{ name }}">{{ desc }}</label>
+            <div class="controls">
+                <input  type="{{ type }}"
+                        name="{{ name }}" id="{{ name }}"
+                        value="{{ request.form[name] }}"
+                        placeholder="{{ placeholder }}">
+                {{ errorhelp(name) }}
+            </div>
+        </div>
+    {%- endmacro %}
+
+NEXT UP
+-------
+
+* port over form validation logic on backend
+* discussion of front-end validation limitations
+* filter for the "published" date (human HTML5 date)
+* implement click redirector on server
+* move static files location to app settings
+* microframework discussion
+* web app layers discussion
+* on to hour 3
+
 Baby Turtles
 ------------
 
