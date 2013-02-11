@@ -1,2 +1,2 @@
 #!/bin/bash
-rsync -avz --progress ./ cogtree@pixelmonkey.org:/data/vhosts/pixelmonkey.org/pub/rapid-web-slides
+rsync --exclude=".git" -avz --progress ./ cogtree@pixelmonkey.org:/data/vhosts/pixelmonkey.org/pub/rapid-web-slides

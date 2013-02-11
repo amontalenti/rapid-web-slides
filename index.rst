@@ -165,7 +165,7 @@ bias" that I observe in the real world.
 
 The typical Python software engineer has no problem with:
 
-* writing a testing a database schema
+* writing and testing a database schema
 * implementing pure Python classes / functions
 * thinking about scale and performance
 * building a command-line interface
@@ -400,7 +400,7 @@ Why Bootstrap?
 
 .. class:: incremental
 
-    * We are not designers.
+    * We are not designers
 
     * HTML's default styling is ugly!
 
@@ -470,6 +470,47 @@ We'll start with the navigation area and header.
 
 We'll then add a simple listing of fake links in a table.
 
+Navigation Area
+---------------
+
+.. sourcecode:: html
+
+    <div class="navbar">
+        <div class="navbar-inner">
+            <a class="brand hidden-phone">Rapid News</a>
+            <a class="brand visible-phone">RN</a>
+            <ul class="nav">
+                <li class="active"><a href="#">Links</a></li>
+                <li><a href="#">Submit</a></li>
+            </ul>
+            <form class="navbar-search pull-right hidden-phone" action="/search">
+                <small><i class="icon-search"></i> Search</small>
+                <input name="query" type="text" class="search-query" placeholder="">
+            </form>
+        </div>
+    </div>
+
+Simple Table
+------------
+
+.. sourcecode:: html
+
+    <table class="table table-hover table-striped">
+        <thead>
+            <tr>
+                <th>Score</th> <th>Link</th> <th>Published</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><span class="label label-important">150</span></td>
+                <td><a href="#">The Meditations of Marcus Aurelius</a></td>
+                <td><span class="label">3 hours ago</span></td>
+            </tr>
+            ...
+        </tbody>
+    </table>
+
 What have we learned?
 ---------------------
 
@@ -489,6 +530,53 @@ Adding Interactivity
 Enter jQuery.
 
 Let's play in the Chrome Inspector console with the jQuery API.
+
+Simple Animation Example
+------------------------
+
+.. sourcecode:: javascript
+
+    function animateRows() {
+        // simple animation to fade in all but the top story
+        var rowNum = 1;
+        var dur = 500;
+        $("tbody tr").each(function() { 
+            if (rowNum === 0) { 
+                // skip 1st row
+                return; 
+            } 
+            // capture current row
+            var elm = $(this); 
+            // schedule it to fade in
+            setTimeout(function() { 
+                elm.fadeIn();
+            }, dur); 
+            dur += 500;
+            rowNum += 1;
+        });
+    };
+
+Organizing JS Code
+------------------
+
+.. sourcecode:: javascript
+
+    // module.js
+    (function() {
+        // anonymous function creates namespace
+        // prevents global leakage
+        function myPrivateFunction() {
+            // private function created in namespace
+        };
+        function myPublicFunction() {
+            var elements = myPrivateFunction();
+            elements.each(function() { ... } );
+            // public function must be exported
+        };
+
+        // export as RAPID.myPublicFunction
+        RAPID.myPublicFunction = myPublicFunction;
+    })();
 
 Chrome Inspector
 ----------------
@@ -912,22 +1000,18 @@ Template Output
 
     <table>
     <tr>
-        <td><strong>Number</strong></td>
-        <td><strong>Square</strong></td>
+        <td><strong>Number</strong></td> <td><strong>Square</strong></td>
     </tr>
         ...
     <tr>
-        <td>3</td>
-        <td>9</td>
+        <td>3</td> <td>9</td>
     </tr>
     <tr>
-        <td>4</td>
-        <td>16</td>
+        <td>4</td> <td>16</td>
     </tr>
         ...
     <tr>
-        <td>9</td>
-        <td>81</td>
+        <td>9</td> <td>81</td>
     </tr>
     <table>
 
@@ -1012,7 +1096,7 @@ Flask App Structure
     def index():
         articles = top_articles()
         return render_template('index.jinja2.html',
-                               articles=articles)
+                               rows=articles)
 
     if __name__ == "__main__":
         app.run(debug=True)
