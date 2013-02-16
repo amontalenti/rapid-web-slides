@@ -28,8 +28,8 @@ interface / front-end issues first, and then filling in the backend details
 The tutorial will be accessible both to programming novices and existing
 programmers.
 
-Python, HTML, and JavaScript will be used -- and some experience with these
-will be helpful -- but specific knowledge with these technologies is not
+Python, HTML, and JavaScript will be used. Some experience with these
+will be helpful, but specific knowledge with these technologies is not
 required to get a lot of value out of this course.
 
 The only pre-requisite is a little familiarity with Github, git, and the
@@ -48,8 +48,7 @@ get stuck, they can "fast-forward" to where I am in the project. This way no
 one is left behind.
 
 The app we'll building is called "Rapid News", a reddit/hacker news style app
-that works off implicit "click & re-submit voting" rather than explicit
-upvoting.
+that works off implicit "click & submit voting" rather than explicit upvoting.
 
 At the end of the tutorial session, we will also have a little "hackathon
 competition" where people use their new skills to build a minimal web app, and
@@ -67,13 +66,12 @@ OPTIONAL HACKATHON
 ~~~~~~~~~~~~~~~~~~
 2pm-5pm
 
-TO ATTEND
-~~~~~~~~~
-[TBD, please fill out this form]
 
 COST
 ~~~~
-$50 per person
+$40 for HackCville Members; $80 for anyone else.
 
 All proceeds donated toward HackCville's "buy big monitors for the hackers"
-fund. NOTE: this same course is being given at PyCon US 2013 for $150/ticket!
+fund. 
+
+NOTE: this same course is being given at PyCon US 2013 for $150/ticket!
