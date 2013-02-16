@@ -538,21 +538,17 @@ Simple Animation Example
 
     function animateRows() {
         // simple animation to fade in all but the top story
-        var rowNum = 1;
-        var dur = 500;
-        $("tbody tr").each(function() { 
-            if (rowNum === 0) { 
+        $("tbody tr").each(function(i, row) { 
+            if (i === 0) { 
                 // skip 1st row
                 return; 
             } 
             // capture current row
-            var elm = $(this); 
+            var elm = $(row); 
             // schedule it to fade in
             setTimeout(function() { 
                 elm.fadeIn();
-            }, dur); 
-            dur += 500;
-            rowNum += 1;
+            }, i * 500);
         });
     };
 
@@ -1600,7 +1596,7 @@ New Template Layout
 Using Macros for Forms
 ----------------------
 
-.. sourcecode:: jinja
+.. sourcecode:: html+jinja
 
     <div id="submit-form">
         <h2>Submit a new article!</h2>
@@ -1611,6 +1607,7 @@ Using Macros for Forms
                 {{ input("title", "Title", placeholder="headline or description") }}
                 <div class="form-actions">
                     {{ button("Submit") }}
+                </div>
             </fieldset>
         </form>
     </div>
@@ -1649,6 +1646,75 @@ Input Component
             </div>
         </div>
     {%- endmacro %}
+
+Filters
+-------
+
+.. class:: incremental
+
+    Filters, like macros, are a form of code re-use in your templates.
+
+    Unlike macros, they are typically written as Python code (rather than Jinja
+    code) and then bound to your template context.
+
+    They are typically used for "value conversions".
+
+Commonly Used Built-In Filters
+------------------------------
+
+.. class:: incremental
+
+    * ``default``, e.g. ``{{ value|default("N/A") }}``
+
+    * ``escape``, e.g. ``{{ user_html|escape }}``
+
+    * ``sort``, e.g. ``{% for article in articles|sort(attribute="pub_date") %}``
+
+    * ``dictsort``, e.g. ``{% for pub_date, article in articles|dictsort %}``
+
+    * ``truncate``, e.g. ``{{ title|truncate(length=100) }}``
+
+Our Own Filter
+--------------
+
+.. sourcecode:: python
+
+    def val_ago(value, unit="unit"):
+        if value == 1: 
+            return "{} {} ago".format(value, unit)
+        else: 
+            return "{} {}s ago".format(value, unit)
+
+Filter Usage
+------------
+
+Example Template:
+
+.. sourcecode:: jinja
+
+    {% for second in range(60) %}
+        {{ second|val_ago(unit="second") }}
+    {% endfor %}
+
+Output:
+
+.. sourcecode:: text
+
+    0 seconds ago
+    1 second ago     <-- notice
+    2 seconds ago
+    ...
+    59 seconds ago
+
+Registering the Filter
+----------------------
+
+TODO
+
+A Super Filter 
+--------------
+
+TODO
 
 NEXT UP
 -------
