@@ -1593,6 +1593,28 @@ New Template Layout
     {% endblock %}
 
 
+Server Side vs Client Side (1)
+------------------------------
+
+.. class:: incremental
+
+    One of the original limitations of our Rapid News "fake" prototype is that the 
+    "Submit" page wasn't functional.
+
+    You might ask: why couldn't I implement that page 100% client-side?
+
+    Technically, you could, but there are a slew of reasons you don't want to do so.
+
+Server Side vs Client Side (2)
+------------------------------
+
+TODO
+
+Client-Side Limitations
+-----------------------
+
+TODO
+        
 Using Macros for Forms
 ----------------------
 
@@ -1726,21 +1748,114 @@ Registering the Filter
 
 .. sourcecode:: jinja
 
-    <ul> {% for second in seconds %}
-           <li>{{ second|seconds_ago }}
-    </ul>{% endfor %}
+    <ul> 
+    {% for second in seconds %}
+        <li>{{ second|seconds_ago }}
+    {% endfor %}
+    </ul>
 
-A Super Filter 
---------------
+A Complex Filter 
+----------------
 
-TODO
+.. class:: incremental
+
+    Filters are very powerful since they can boil down some complex processing logic into
+    a simple front-end value transformation.
+
+    The example we're going to work through now involves converting absolute ``datetime``
+    objects into human-readable relative dates, such as "10 seconds ago", and "3 days ago".
+
+    We'll implement this with a pure Python function we'll then bind as a template filter.
+
+Test Cases
+----------
+
+.. sourcecode:: python
+
+    jan1 = dt.datetime(2013, 1, 1)
+    def test_case(expected, **kwargs): #**
+        val = jan1 - dt.timedelta(**kwargs) #**
+        human = human_date(val, nowfunc=lambda: jan1)
+        assert human == expected, human
+    test_case("1 day ago", days=1)
+    test_case("2 days ago", days=2)
+    test_case("5 seconds ago", seconds=5)
+    test_case("2 minutes ago", seconds=60*2)
+    test_case("3 hours ago", seconds=60*60*3)
+    test_case("12/25/2012", days=7)
+
+Filter Implementation
+---------------------
+
+.. sourcecode:: python
+
+    def human_date(dateval, nowfunc=dt.datetime.now):
+        now = nowfunc()
+        delta = now - dateval
+        days = delta.days
+        if days == 0:
+            seconds = delta.seconds
+            minutes = seconds / 60
+            hours = minutes / 60
+            if hours > 0:
+                return val_ago(hours, unit="hour")
+            if minutes > 0:
+                return val_ago(minutes, unit="minute")
+            return val_ago(seconds, unit="second")
+        elif 0 < days < 7:
+            return val_ago(days, unit="day")
+        else:
+            return dateval.strftime("%m/%d/%Y")
+
+Using the New Complex Filter
+----------------------------
+
+.. sourcecode:: python
+
+    import datetime as dt
+    from filters import human_date
+    app.add_template_filter(human_date)
+
+    def _example_dates():
+        now = dt.datetime.now()
+        deltas = [  dt.timedelta(seconds=5),
+                    dt.timedelta(seconds=60*60),
+                    dt.timedelta(days=5),
+                    dt.timedelta(days=60)]
+        dates = [now - delta for delta in deltas]
+        return dates
+        
+    @app.route('/datetest')
+    def datetest():
+        dates = _example_dates()
+        return render_template('dates.jinja2.html',
+                                dates=dates)
+
+Template Usage of Complex Filter
+--------------------------------
+
+.. sourcecode:: jinja
+
+    <ul>
+    {% for date in dates %}
+        <li>{{ date }} ({{ date|human_date }})
+    {% endfor %}
+    </ul>
+
+with output:
+
+.. sourcecode:: html
+  
+    <ul>
+        <li>2013-02-18 09:40:18.713401 (5 seconds ago)
+        <li>2013-02-18 08:40:23.713401 (1 hour ago)
+        <li>2013-02-13 09:40:23.713401 (5 days ago)
+        <li>2012-12-20 09:40:23.713401 (12/20/2012)
+    </ul>  
 
 NEXT UP
 -------
 
-* port over form validation logic on backend
-* discussion of front-end validation limitations
-* filter for the "published" date (human HTML5 date)
 * implement click redirector on server
 * move static files location to app settings
 * microframework discussion

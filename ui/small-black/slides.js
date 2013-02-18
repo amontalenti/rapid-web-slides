@@ -176,7 +176,6 @@ function go(step) {
 }
 
 function goTo(target) {
-    console.log("goto: "+ target);
 	if (target >= smax || target == snum) return;
 	go(target - snum);
 }
@@ -318,7 +317,6 @@ function clicker(e) {
 }
 
 function findSlide(hash) {
-    console.log("finding slide");
     if (hash.indexOf("(") === 0) {
         var jumpSlide = hash.replace("(", "").replace(")", "");
         jumpSlide = parseInt(jumpSlide);
@@ -563,7 +561,6 @@ function startup() {
 		document.onkeypress = trap;
 		document.onclick = clicker;
         window.onhashchange = function() {
-            console.log("hash change!")
             slideJump();
         };
         document.oncontextmenu = function() {
