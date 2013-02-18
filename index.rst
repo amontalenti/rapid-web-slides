@@ -1709,7 +1709,26 @@ Output:
 Registering the Filter
 ----------------------
 
-TODO
+.. sourcecode:: python
+
+    from filters import val_ago
+
+    @app.template_filter()
+    def seconds_ago(val):
+        return val_ago(val, unit="second")
+
+    @app.route('/experiment')
+    def experiment():
+        return render_template('seconds.jinja2.html',
+                                seconds=range(60))
+
+... and ... 
+
+.. sourcecode:: jinja
+
+    <ul> {% for second in seconds %}
+           <li>{{ second|seconds_ago }}
+    </ul>{% endfor %}
 
 A Super Filter 
 --------------

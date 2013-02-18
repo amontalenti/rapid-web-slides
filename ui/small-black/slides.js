@@ -170,11 +170,13 @@ function go(step) {
 	ce.style.visibility = 'hidden';
 	ne.style.visibility = 'visible';
 	jl.selectedIndex = snum;
+    location.hash = "(" + snum + ")";
 	currentSlide();
 	number = 0;
 }
 
 function goTo(target) {
+    console.log("goto: "+ target);
 	if (target >= smax || target == snum) return;
 	go(target - snum);
 }
@@ -250,7 +252,7 @@ function keys(key) {
 			case 13: // enter
 				if (window.event && isParentOrSelf(window.event.srcElement, 'controls')) return;
 				if (key.target && isParentOrSelf(key.target, 'controls')) return;
-				if(number != undef) {
+				if(number != undef && number != 0) {
 					goTo(number);
 					break;
 				}
@@ -278,7 +280,7 @@ function keys(key) {
 				}
 				break;
 			case 36: // home
-				goTo(0);
+				//goTo(0);
 				break;
 			case 35: // end
 				goTo(smax-1);
@@ -316,12 +318,21 @@ function clicker(e) {
 }
 
 function findSlide(hash) {
-	var target = document.getElementById(hash);
-	if (target) {
-		for (var i = 0; i < slideIDs.length; i++) {
-			if (target.id == slideIDs[i]) return i;
-		}
-	}
+    console.log("finding slide");
+    if (hash.indexOf("(") === 0) {
+        var jumpSlide = hash.replace("(", "").replace(")", "");
+        jumpSlide = parseInt(jumpSlide);
+        if (jumpSlide > 0) {
+            return jumpSlide;
+        }
+    } else {
+        var target = document.getElementById(hash);
+        if (target) {
+            for (var i = 0; i < slideIDs.length; i++) {
+                if (target.id == slideIDs[i]) return i;
+            }
+        }
+    }
 	return null;
 }
 
@@ -551,10 +562,15 @@ function startup() {
 		document.onkeyup = keys;
 		document.onkeypress = trap;
 		document.onclick = clicker;
+        window.onhashchange = function() {
+            console.log("hash change!")
+            slideJump();
+        };
         document.oncontextmenu = function() {
             go(-1);
             return false;
         };
+
 	}
 }
 
