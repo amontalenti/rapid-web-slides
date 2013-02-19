@@ -559,15 +559,10 @@ function startup() {
 		}
 		document.onkeyup = keys;
 		document.onkeypress = trap;
-		document.onclick = clicker;
+		// document.onclick = clicker;
         window.onhashchange = function() {
             slideJump();
         };
-        document.oncontextmenu = function() {
-            go(-1);
-            return false;
-        };
-
 	}
 }
 

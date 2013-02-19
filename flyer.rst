@@ -69,7 +69,7 @@ OPTIONAL HACKATHON
 
 COST
 ~~~~
-$40 for HackCville Members; $80 for anyone else.
+$20 for HackCville Members; $40 for anyone else.
 
 All proceeds donated toward HackCville's "buy big monitors for the hackers"
 fund. 
