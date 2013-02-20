@@ -1979,16 +1979,366 @@ with output:
         <li>2012-12-20 09:40:23.713401 (12/20/2012)
     </ul>  
 
+Filter Usage in Rapid News
+--------------------------
+
+.. sourcecode:: html+jinja
+
+    {% for row in rows|sort(attribute="date", reverse=True) %}
+        <tr>
+            <td><span class="label label-important">{{ row.score }}</span></td>
+            <td><a href="{{ row.link }}">{{ row.title }}</a></td>
+            <td><span class="label">{{ row.date|human_date }}</span></td>
+        </tr>
+    {% endfor %}
+ 
 Click Redirector Brainstorm
 ---------------------------
 
-NEXT UP
--------
+.. class:: incremental
 
-* implement click redirector on server
-* microframework discussion
-* web app layers discussion
-* on to hour 3
+    Last piece of the server puzzle for this app is the click redirector.
+
+    We'll be able to measure re-submit upvotes by instrumenting ``insert_article``.
+
+    But to measure clickthroughs, we need to replace our links in the app with something else.
+
+    Shall we brainstorm ideas?
+
+Click Redirector Implementation
+-------------------------------
+
+.. class:: incremental
+
+    A Flask Route called "/click" that takes a single parameter, ``url``, and
+    tracks a click to that URL.  This will utilize a database call called
+    ``track_click`` that tracks this URL in our database.  Then, directs the user
+    to the appropriate URL via an HTTP redirect.
+
+    A Jinja macro called "tracked_link()" that takes a title and URL and
+    generates a link tag to our "/click" route.
+
+Click Endpoint
+--------------
+
+.. sourcecode:: python
+
+    @app.route('/click/')
+    def click():
+        url = request.args["url"]
+        track_click(url)
+        return redirect(url)
+
+Click Tracking Macro
+--------------------
+
+.. sourcecode:: jinja
+
+    {%- macro tracked_link(title, url) -%}
+            <a href="{{ url_for("click", url=url) }}">{{ title }}</a>
+    {%- endmacro -%}
+
+... and its usage:
+
+.. sourcecode:: jinja
+
+    <tr>
+        <td><span class="label label-important">{{ row.score }}</span></td>
+        <td>{{ tracked_link(row.title, row.link) }}</td>
+        <td><span class="label">{{ row.date|human_date }}</span></td>
+    </tr>
+
+Onward to "Shipping It!"
+------------------------
+
+Let's take a 5m break to answer questions / reflect a bit.
+
+Server Setup
+------------
+
+So far, all of our development has been "local" -- namely, you do all your work
+directly on your development workstation.
+
+This has lots of benefits:
+
+.. class:: incremental
+
+    * Simplicity
+
+    * Speed
+
+    * Instantaneous feedback loop
+
+However, eventually, you want to have a server for your web app -- even if it
+is only a prototype.
+
+Lots of Choices
+---------------
+
+We have no shortage of choices when it comes to where to deploy our Python application.
+
+.. class:: incremental
+
+    * "Shared" Hosting Environments, like Webfaction and Dreamhost.
+    * "Cloud" Hosting Environments, like Rackspace Cloud and Amazon Web Services.
+    * "Platforms", like Heroku and dotCloud.
+
+Rackspace Cloud Environment
+---------------------------
+
+For simplicity, I'm going to walk you through the deployment of our app on Rackspace Cloud.
+
+Unlike "Shared" hosting environments, Rackspace gives you full control of your
+deployment Linux operating system, aka "root access".
+
+And unlike Platforms, you are not locked into using any proprietary deployment
+tooling or process.
+
+Basically, Rackspace gives you a "virtual private server".
+
+What is a server, anyway?
+-------------------------
+
+* Typically a Linux machine.
+* Typically some fixed base resources, such as CPU, Memory, Disk.
+* A stable public IP address.
+* Usually a stable private IP address, too.
+
+hacknode
+--------
+
+Our Rackspace Nextgen Cloud Server.
+
+* RAM: 512MB of RAM
+* Disk: 20GB Attached
+* OS: Ubuntu 12.04 LTS
+* Location: Rackspace Chicago (ORD)
+* Public IP: 166.78.109.8
+* Private IP: 10.177.128.157
+
+Access via SSH
+--------------
+
+.. class:: incremental
+
+    Initial access to the server is granted via a "root" account, with a pre-determined password.
+
+    From that moment on, most people switch to SSH connections via public/private key pairs.
+
+    This has the side benefit of obviating the need for password entry at the command-line.
+
+    (Github uses this same trick for Git access.)
+
+Control via SSH
+---------------
+
+.. class:: incremental
+
+    Once you have SSH access, you can use the ``ssh`` command as a simple remote job runner.
+
+    e.g. ``ssh hacknode ls /tmp`` will list the contents of the ``/tmp`` directory on the server.
+
+    e.g. ``ssh hacknode ps aux`` will list all running processes on the server.
+
+SSH Config
+----------
+
+.. class:: incremental
+
+    SSH has a small configuration file at ``~/.ssh/config`` that allows you to
+    specify hostnames that ssh will use.
+
+    Upon connecting to a server, ssh looks for an identity file for public key
+    authentication. This is typically ``~/.ssh/id_rsa``.
+
+    This private key has a matching public key, which is typically ``~/.ssh/id_rsa.pub``
+    and must be listed in the remote host's ``~/.ssh/authorized_keys`` file.
+
+Introducing Fabric
+------------------
+
+.. class:: incremental
+
+    Once you have SSH set up correctly and can connect to / run remote commands on
+    a remote server, you are all ready to start scripting deployment.
+
+    In the Python community, we use a simple tool called ``Fabric`` for this.
+
+    Fabric installs a little program called ``fab`` into your PATH.
+
+    ``fab`` looks for a file called ``fabfile.py``, which is written using Fabric's 
+    core library. You define ``tasks`` that correspond to command-line arguments.
+
+    Tasks can actually do pretty much anything, but are typically used for
+    scripting remote machines, e.g. copying files onto the remote machine and
+    executing remote commands.
+
+Set up new dependencies
+-----------------------
+
+In ``requirements.txt``:
+
+.. sourcecode:: text
+
+    ipython
+    Flask
+    Flask-Script
+    Fabric
+
+And re-install with ``pip install -r requirements.txt``.
+
+Set up Flask-Script Manager
+---------------------------
+
+This will help us with deployment later.
+
+.. sourcecode:: python
+
+    from flask.ext.script import Manager
+
+    app = Flask(...)
+    manager = Manager(app)
+
+    if __name__ == "__main__":
+        manager.run()
+
+Running Flask-Script
+--------------------
+
+.. sourcecode:: text
+
+    $ python app.py
+    Please provide a command:
+    runserver  Runs the Flask development server i.e. app.run()
+    shell      Runs a Python shell inside Flask application context.
+
+So, e.g., to run on all IPs and port 8000:
+
+.. sourcecode:: text
+
+    $ python app.py runserver --host=0.0.0.0 --port=8000
+    * Running on http://0.0.0.0:8000/
+    
+Our First fabfile
+-----------------
+
+.. sourcecode:: python
+
+    from fabric.api import *
+
+    env.use_ssh_config = True
+    env.hosts = ["shared@hacknode"]
+
+    @task
+    def list_home():
+        """List files in home directory."""
+        run("ls -lha") 
+
+Running fab (1)
+---------------
+
+.. sourcecode:: text
+
+    $ fab -l
+
+    Available commands:
+
+        list_home         List files in home directory.
+ 
+Running fab (2)
+---------------
+
+.. sourcecode:: text
+
+    $ fab list_home
+    [shared@hacknode] Executing task 'list_home'
+    [shared@hacknode] run: ls -lha
+    [shared@hacknode] out: total 40K
+    [shared@hacknode] out: drwxr-xr-x 6 shared shared 4.0K Feb 20 23:33 .
+    [shared@hacknode] out: drwxr-xr-x 4 root   root   4.0K Feb 20 21:19 ..
+    [shared@hacknode] out: -rw------- 1 shared shared  159 Feb 20 23:17 .bash_history
+    [shared@hacknode] out: -rw-r--r-- 1 shared shared  220 Feb 20 21:19 .bash_logout
+    [shared@hacknode] out: -rw-r--r-- 1 shared shared 3.5K Feb 20 21:19 .bashrc
+    [shared@hacknode] out: drwx------ 2 shared shared 4.0K Feb 20 21:20 .cache
+    [shared@hacknode] out: drwxrwxr-x 2 shared shared 4.0K Feb 20 23:33 .pip
+    [shared@hacknode] out: -rw-r--r-- 1 shared shared  675 Feb 20 21:19 .profile
+    [shared@hacknode] out: drwxr-xr-x 2 shared shared 4.0K Feb 20 21:20 .ssh
+    [shared@hacknode] out: 
+    Done.
+    Disconnecting from shared@166.78.109.8... done.
+
+Setting Up a Deploy
+-------------------
+
+.. sourcecode:: python
+
+    from fabric.contrib.project import rsync_project
+
+    def unique_id():
+        def sh(cmd): return local(cmd, capture=True)
+        return "{}__{}".format(sh("whoami"), sh("hostname"))
+
+    @task
+    def print_my_id():
+        """Print your unique identifier."""
+        puts("UNIQUE ID: " + unique_id())
+
+    @task
+    def deploy():
+        """Deploy project remotely."""
+        run("mkdir -p deploys")
+        rsync_project(remote_dir="deploys/" + unique_id(),
+                      local_dir="./",
+                      exclude=(".git", "rapid-env", "steps", "activate"))
+
+Setting up a Virtualenv
+-----------------------
+
+.. sourcecode:: python
+
+    def virtualenv_run(cmd):
+        run("source rapid-env/bin/activate && {}".format(cmd))
+
+    @task
+    def setup_virtualenv():
+        """Set up virtualenv on remote machine."""
+        with cd("deploys/" + unique_id()):
+            run("virtualenv rapid-env")
+            virtualenv_run("pip install -r requirements.txt")
+
+Setting up a Remote Run
+-----------------------
+
+.. sourcecode:: python
+
+    @task
+    def run_devserver():
+        """Run the dev Flask server on remote machine."""
+        with cd("deploys/" + unique_id()):
+            virtualenv_run("cd app && python app.py runserver --host=0.0.0.0 --port=8000")
+
+Server Setup, Fully Automated
+-----------------------------
+
+.. sourcecode:: text
+
+    $ fab -l
+    Available commands:
+
+        deploy            Deploy project remotely.
+        list_deploys      List deployment directories.
+        list_home         List files in home directory.
+        print_my_id       Print your unique identifier.
+        run_devserver     Run the dev Flask server on remote machine.
+        setup_virtualenv  Set up virtualenv on remote machine.
+    $ fab deploy
+    ...
+    $ fab setup_virtualenv
+    ...
+    $ fab run_devserver
+    [shared@hacknode] * Running on http://0.0.0.0:8000/
+    
+Now, we navigate over to http://hacknode1.alephpoint.com:8000/.
 
 Baby Turtles
 ------------
