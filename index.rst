@@ -1608,15 +1608,130 @@ Server Side vs Client Side (1)
 Server Side vs Client Side (2)
 ------------------------------
 
-TODO
+.. class:: incremental
 
-Client-Side Limitations
------------------------
+    * Misplaced Trust in Client.
 
-TODO
-        
-Using Macros for Forms
-----------------------
+    * No Access to Secrets.
+
+    * Minimal Standard Library.
+
+    * Keyhole Access to Database.
+
+    * JavaScript Interpreter Performance.
+
+Client-Side Security Concerns
+-----------------------------
+
+.. class:: incremental
+
+    * Cross-Site Scripting (XSS).
+
+    * Cross-Site Request Forgery (CSRF).
+
+Bottom Line on Client vs Server
+-------------------------------
+
+.. class:: incremental
+
+    * All user data must be validated server-side. Optionally, can "convenience
+      check" on client side.
+
+    * JavaScript code must run under the "hostile environment" assumption that
+      an attacker can change any aspect of DOM, functions, classes, etc.
+
+    * Where dynamism is needed, it's preferable to do HTTP/JSON requests to
+      server via XMLHTTPRequest or JSON-P.
+
+HTML Forms for Server Interaction
+---------------------------------
+
+Now that we understand why we need the server to validate data coming from the user, let's 
+make our original "Submit" form server-enabled.
+       
+.. sourcecode:: html
+
+    <div id="submit-form">
+        <form method="POST">
+            <fieldset>
+                <!-- ... -->
+            </fieldset>
+        </form>
+    </div>
+
+Fieldset with Control Groups
+----------------------------
+
+.. sourcecode:: html
+
+    <div class="control-group ">
+        <label class="control-label" for="link">Link</label>
+        <div class="controls">
+            <input  type="text" 
+                    name="link" id="link" 
+                    value=""
+                    placeholder="http://...">
+            
+        </div>
+    </div>
+    <div class="control-group ">
+        <label class="control-label" for="title">Title</label>
+        <div class="controls">
+            <input  type="text" 
+                    name="title" id="title" 
+                    value=""
+                    placeholder="headline or description">
+        </div>
+    </div>
+
+Macro'izing an Input Component
+------------------------------
+
+.. sourcecode:: jinja
+
+    {% macro input(name, desc, type='text', placeholder=None) -%}
+        <div class="control-group {{ error(name) }}">
+            <label class="control-label" for="{{ name }}">{{ desc }}</label>
+            <div class="controls">
+                <input  type="{{ type }}"
+                        name="{{ name }}" id="{{ name }}"
+                        value="{{ request.form[name] }}"
+                        placeholder="{{ placeholder }}">
+                {{ errorhelp(name) }}
+            </div>
+        </div>
+    {%- endmacro %}
+
+Macro'izing (2)
+---------------
+
+.. sourcecode:: jinja
+
+    {% macro error(name) -%}
+        {% if errors and errors[name] -%}
+            error
+        {% endif -%}
+    {% endmacro -%}
+
+    {% macro errorhelp(name) -%}
+        {% if errors and errors[name] -%}
+            <span class="help-inline">{{ errors[name] }}</span>
+        {% endif -%}
+    {% endmacro -%}
+
+
+Macro'izing (3)
+---------------
+
+.. sourcecode:: jinja
+
+    {% macro button(name) -%}
+        <button type="submit" class="btn btn-primary">{{ name }}</button>
+    {%- endmacro %}
+
+ 
+Using Macros as Form Components
+-------------------------------
 
 .. sourcecode:: html+jinja
 
@@ -1634,40 +1749,51 @@ Using Macros for Forms
         </form>
     </div>
 
-Error Handling
---------------
+Implement Validation
+--------------------
 
-.. sourcecode:: jinja
+.. sourcecode:: python
 
-    {% macro error(name) -%}
-        {% if errors and errors[name] -%}
-            error
-        {% endif -%}
-    {% endmacro -%}
+    def validate_submission(params):
+        errors = {}
+        def err(id, msg):
+            errors[id] = msg
+        title = params["title"].strip()
+        if len(title) < 2:
+            err("title", "title must be > 2 characters")
+        if len(title) > 150:
+            err("title", "title may not be > 150 characters")
+        link = params["link"].strip()
+        try:
+            opened = urlopen(link)
+            link = opened.geturl()
+        except (URLError, ValueError):
+            err("link", "link could not be reached")
+        if len(errors) > 0:
+            return (False, errors)
+        else:
+            return (True, errors)
 
-    {% macro errorhelp(name) -%}
-        {% if errors and errors[name] -%}
-            <span class="help-inline">{{ errors[name] }}</span>
-        {% endif -%}
-    {% endmacro -%}
+Using the Validation Function
+-----------------------------
 
-Input Component
----------------
+.. sourcecode:: python
 
-.. sourcecode:: jinja
-
-    {% macro input(name, desc, type='text', placeholder=None) -%}
-        <div class="control-group {{ error(name) }}">
-            <label class="control-label" for="{{ name }}">{{ desc }}</label>
-            <div class="controls">
-                <input  type="{{ type }}"
-                        name="{{ name }}" id="{{ name }}"
-                        value="{{ request.form[name] }}"
-                        placeholder="{{ placeholder }}">
-                {{ errorhelp(name) }}
-            </div>
-        </div>
-    {%- endmacro %}
+    def do_submit():
+        form = request.form
+        submission = dict(
+            title=form["title"],
+            link=form["link"]
+        )
+        valid, errors = validate_submission(submission)
+        if valid:
+            article = insert_article(submission)
+            return render_template("success.jinja2.html",
+                                page_submit="active")
+        else:
+            return render_template('submit.jinja2.html',
+                                page_submit="active",
+                                errors=errors)
 
 Filters
 -------
@@ -1853,11 +1979,13 @@ with output:
         <li>2012-12-20 09:40:23.713401 (12/20/2012)
     </ul>  
 
+Click Redirector Brainstorm
+---------------------------
+
 NEXT UP
 -------
 
 * implement click redirector on server
-* move static files location to app settings
 * microframework discussion
 * web app layers discussion
 * on to hour 3
