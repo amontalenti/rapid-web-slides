@@ -2317,8 +2317,8 @@ Setting up a Remote Run
         with cd("deploys/" + unique_id()):
             virtualenv_run("cd app && python app.py runserver --host=0.0.0.0 --port=8000")
 
-Server Setup, Fully Automated
------------------------------
+Dev Server Setup, Fully Automated
+---------------------------------
 
 .. sourcecode:: text
 
@@ -2339,6 +2339,199 @@ Server Setup, Fully Automated
     [shared@hacknode] * Running on http://0.0.0.0:8000/
     
 Now, we navigate over to http://hacknode1.alephpoint.com:8000/.
+
+Dev vs Prod Deployment Server
+-----------------------------
+
+TODO
+
+nginx
+-----
+
+TODO
+
+supervisor
+----------
+
+TODO
+
+Lightweight Deployment Stack Overview
+-------------------------------------
+
+TODO
+
+hacknode Team Setup Overview
+----------------------------
+
+TODO
+
+Small fabfile changes
+---------------------
+
+TODO
+
+Running prod
+------------
+
+TODO
+
+Onward to Databases
+-------------------
+
+Various database types:
+
+    * SQL
+    * NoSQL
+    * Search
+    * Dynamo
+
+Even within these types, multiple database styles!
+
+    * Schema vs Schema-less
+    * Distributed vs Single-Node
+    * Dev-friendly vs Sysadmin friendly
+
+Let's try to sort through the madness.
+
+NoSQL: Redis
+------------
+
+"Data structures database."
+
+Key-value store. In-memory storage with optional backups to disk.
+
+strings, sets, sorted sets, hashes
+
+Good for: high-performance, low-importance data.
+
+NoSQL: MongoDB
+--------------
+
+"Document database."
+
+Stores JSON documents, both flat and compound.
+
+Supports indexing for fast queries by using memory.
+
+Has a good replication / sharding story and a great out-of-box experience for
+developers.
+
+Good for: simple data storage use cases and some high-performance use cases.
+
+SQL: SQLite
+-----------
+
+"World's simplest SQL database."
+
+Supports full SQL standard, but runs as an "embedded" server.
+
+Good for: development environments, learning SQL, desktop applications.
+
+Not good for servers; no concurrency story.
+
+SQL: Postgres
+-------------
+
+"World's most advanced open source SQL database."
+
+Supports full SQL standard, "and then some".
+
+Has a great replication story, lots of developer tooling, and tons of
+performance optimization.
+
+Good for: detailed reporting needs, transactional systems, and also 
+many "common" web app use cases.
+
+Only downsides: some sysadmin burden, some complex tooling/configuration, and
+you must know SQL.
+
+Search: Solr
+------------
+
+"World's most advanced open source search engine."
+
+Supports full-text search and complex filtering and faceting.
+
+Recently, has a good replication story, decent developer tooling, and tons of
+performance optimization.
+
+Good for: any use case where you're dealing with large amounts of text, or where you need 
+to offer a "search" or "drill-down" (filter/refine) interface to users.
+
+Search: ElasticSearch
+---------------------
+
+"New contender in search engine space."
+
+Supports much of the same functionality as Solr, but was written from ground-up to have a 
+better replication/sharding story.
+
+Good for: large-scale search use cases, e.g. searching the Twitter firehose.
+
+Dynamo: Cassandra and Riak
+--------------------------
+
+TODO
+
+Picking One: MongoDB
+--------------------
+
+TODO
+
+Installing MongoDB
+------------------
+
+TODO
+
+Storing our first datum
+-----------------------
+
+TODO
+
+Using pymongo
+-------------
+
+TODO
+
+MongoDB query module
+--------------------
+
+TODO
+
+Layered Architecture Review
+---------------------------
+
+TODO
+
+Shipping It!
+------------
+
+TODO
+
+Growing Up with Frameworks
+--------------------------
+
+TODO
+
+Tornado and API Servers
+-----------------------
+
+TODO
+
+Django and SaaS Apps
+--------------------
+
+TODO
+
+Thoughts on SOA
+---------------
+
+TODO
+
+Recap
+-----
+
+TODO
 
 Baby Turtles
 ------------
