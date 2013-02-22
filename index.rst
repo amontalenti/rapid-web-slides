@@ -2688,19 +2688,17 @@ Why MongoDB?
 
 .. class:: incremental
 
-    * Doesn't require me to teach you anything about SQL -- "documents" are an
+    Doesn't require me to teach you anything about SQL -- "documents" are an
     intuitive and even Python-friendly concept.
 
-    * Awesome developer experience: you install it, and with zero
+    Awesome developer experience: you install it, and with zero
     configuration, you're basically ready to store data.
 
-    * pymongo driver lets you use Python dictionaries as MongoDB documents:
-    simple!
+    pymongo driver lets you use Python dicts as MongoDB documents: simple!
 
-    * mongo "shell" is actually a JavaScript shell.
+    mongo "shell" is actually a JavaScript shell.
 
-    * Scales pretty well. We even use it for a lot of our production data at
-    Parse.ly for its performance benefits!
+    Scales pretty well. We even use it at Parse.ly!
 
 Installing MongoDB
 ------------------
@@ -2738,14 +2736,24 @@ Using pymongo
     >>> import pymongo
     >>> pymongo.MongoClient()
     MongoClient('localhost', 27017)
+
     >>> client = pymongo.MongoClient()
     >>> client.hacknode1
     Database(MongoClient('localhost', 27017), u'hacknode1')
+
     >>> client.hacknode1.articles
     Collection(Database(MongoClient('localhost', 27017), u'hacknode1'), u'articles')
+
+Querying pymongo
+----------------
+
+.. sourcecode:: python
+
     >>> coll = client.hacknode1.articles
+
     >>> coll.find()
     <pymongo.cursor.Cursor at 0x2b1b350>
+
     >>> list(coll.find())
     [{u'_id': ObjectId('51277ff21aba565f2bc54c5e'),
     u'link': u'http://google.com',
@@ -2763,8 +2771,8 @@ MongoDB query module
     def get_collection():
         return MongoClient()[TEAM_NAME].articles 
 
-MongoDB instrumentation for insert_article
-------------------------------------------
+Storing data upon article submit
+--------------------------------
 
 .. sourcecode:: python
 
@@ -2777,7 +2785,7 @@ MongoDB instrumentation for insert_article
         return True
 
 Handling Submit "Explicit Upvoting"
-----------------------------------
+-----------------------------------
 
 .. sourcecode:: python
 
@@ -2786,6 +2794,7 @@ Handling Submit "Explicit Upvoting"
         existing = coll.find_one({"link": article["link"]})
         if existing is not None:
             print "Found existing, explicit upvoting ->", existing
+            # updates the document server-side, incrementing score by 5
             coll.update({"link": existing["link"]},
                         {"$inc":
                             {"score": 5}
@@ -2795,6 +2804,7 @@ Handling Submit "Explicit Upvoting"
             article["score"] = 0
             article["date"] = dt.datetime.now()
             print "Inserting ->", article
+            # inserts a fresh document
             coll.insert(article)
             return True
 
@@ -2806,6 +2816,7 @@ Handling Click "Implicit Upvoting"
     def track_click(url):
         coll = get_collection()
         print "Tracking ->", url
+        # updates document server-side, incrementing by 1
         coll.update({"link": url}, 
                     {"$inc": 
                         {"score": 1}
@@ -2819,6 +2830,8 @@ Handling "Basic" Search
 
     def search_articles(query):
         print "Searching ->", query
+        # does a regular expression match server-side
+        # good for a hacky v1
         articles = coll.find({"title": 
                                 {"$regex": query}
                              })
@@ -2827,32 +2840,117 @@ Handling "Basic" Search
 Architecture Review
 -------------------
 
-TODO
+.. sourcecode:: text
+
+    Web Request
+        --> nginx
+            --> uwsgi / supervisor
+                --> Flask
+                    --> Python / MongoDB
+                    --> Jinja2 Templates
+            --> Web Response
+        --> HTML
+    Browser
+        --> Requests for Bootstrap CSS/JS
+        --> Requests for jQuery JS
+        --> Dynamic Element Modification
 
 Growing Up with Frameworks
 --------------------------
 
-TODO
+Flask is a "microframework" in that it lets you keep the technology small and
+wire pieces together as you need them.
+
+Larger projects might need to "grow up" into other Python web frameworks. We'll
+discuss two: Tornado and Django.
 
 Tornado and API Servers
 -----------------------
 
-TODO
+Tornado is like a "programmable nginx". Meant for handling 10,000 concurrent
+requests.
+
+Good for: high-performance API servers.
+
+Difficulties:
+
+    * completely different programming model (callback-driven)
+    * not compatible with all Python libraries
 
 Django and SaaS Apps
 --------------------
 
-TODO
+Django is Python's most popular open source web framework.
+
+Deployment is similar to Flask, so performance is similar.
+
+Very popular for software-as-a-service web apps.
+
+Django Difficulties
+-------------------
+
+.. class:: incremental
+
+    Has its own template engine that is less intuitive / powerful vs Jinja2
+
+    Built around an ORM (Object-Relational Mapper) that assumes you will use SQL
+
+    Even if you use SQL, their ORM is under-powered vs e.g. SQLAlchemy
+
+    IMO, a lot of "magic" in the framework that doesn't need to be there
+
+Django Pros
+-----------
+
+.. class:: incremental
+
+    Awesome admin interface built with the ORM
+    
+    Lots of open source plugins via "middleware"
+    
+    Good pattern for large applications with multiple "subapps"
+
+    Has a built-in "users" and "groups" model for multi-user web apps
+    
+    More widely used in production, analyzed for security etc.
 
 Thoughts on SOA
 ---------------
 
-TODO
+Service-Oriented Architecture (SOA) allows you to mix-and-match services by
+defining how they talk to one another.
+
+HTTP and JSON provide a low-cost and easy-to-understand communication protocol 
+between these services.
+
+As your web app grows up, it might make sense to think about it as a "few small apps 
+communicating with well-defined interfaces." This will allow you to use the best tool 
+for the job.
+
+e.g. use Flask for your main app, and Tornado for your API server.
 
 Recap
 -----
 
-TODO
+You've learned a lot!
+
+.. class:: incremental
+
+    Rapid Web Prototyping doesn't mean jumping right into code.
+
+    Static HTML / CSS / JavaScript can short-circuit the user feedback process.
+
+    Good-looking UIs can be built by non-designers.
+
+    Lightweight tools, like Bootstrap and Flask, can get you to working web app  
+    in record time.
+
+    Web development isn't magic! It's just putting a few pieces together.
+
+Questions?
+----------
+
+Let's discuss what we've learned!
 
 Baby Turtles
 ------------
