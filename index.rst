@@ -2080,8 +2080,8 @@ We have no shortage of choices when it comes to where to deploy our Python appli
 .. class:: incremental
 
     * "Shared" Hosting Environments, like Webfaction and Dreamhost.
-    * "Cloud" Hosting Environments, like Rackspace Cloud and Amazon Web Services.
-    * "Platforms", like Heroku and dotCloud.
+    * "Cloud" Environments, like Rackspace Cloud and Amazon Web Services.
+    * "Platforms", like Heroku and Google App Engine.
 
 Rackspace Cloud Environment
 ---------------------------
@@ -2091,8 +2091,9 @@ For simplicity, I'm going to walk you through the deployment of our app on Racks
 Unlike "Shared" hosting environments, Rackspace gives you full control of your
 deployment Linux operating system, aka "root access".
 
-And unlike Platforms, you are not locked into using any proprietary deployment
-tooling or process.
+And unlike "Platforms", you are not locked into using any proprietary deployment
+tooling or process. My other worry with "Platforms" is that you don't learn
+anything about how the web really works.
 
 Basically, Rackspace gives you a "virtual private server".
 
@@ -2343,55 +2344,257 @@ Now, we navigate over to http://hacknode1.alephpoint.com:8000/.
 Dev vs Prod Deployment Server
 -----------------------------
 
-TODO
+Running a development server is good enough for our early prototyping, but when we 
+ship our app, we want to run in a "real" web server.
 
-nginx
+Why?
+
+.. class:: incremental
+
+    * dev server shuts down when you log out
+    * dev server may be insecure
+    * prod server is more scalable and resilient
+    * prod server will give us better sysadmin / monitoring options
+
+uwsgi
 -----
 
-TODO
+A lightweight bridge between programming languages and web servers.
+
+Originally built just for Python (due to WSGI standard), but now even being used by other languages.
+
+One command and your web application is ready to be plugged into any web server.
+
+uwsgi command
+-------------
+
+.. sourcecode:: sh
+
+    uwsgi 
+        # enable HTTP and Python plugins
+        --plugins=http,python
+        # use this socket
+        -s /tmp/uwsgi-hacknode1.sock
+        # find the Python web app module in this file
+        --file /home/shared/servers/hacknode1/app/app.py
+        # look for the variable "app" for the server to run 
+        --callable app
+        # set the PYTHONHOME directory to our virtualenv
+        -H /home/shared/servers/hacknode1/rapid-env
 
 supervisor
 ----------
 
-TODO
+supervisor is the most lightweight service runner.
+
+Allows us to run a "long-lived" task, like our web server.
+
+Handles auto-healing, logging, and a simple start/stop/restart user interface.
+
+We'll use it to run our uwsgi instance.
+
+supervisor config
+-----------------
+
+Lives in ``/etc/supervisor/conf.d/hacknode1.conf``:
+
+.. sourcecode:: ini
+
+    [program:hacknode1]
+    command=\
+        uwsgi \
+        --plugins=http,python \
+        -s /tmp/uwsgi-hacknode1.sock \
+        --file /home/shared/servers/hacknode1/app/app.py --callable app \
+        -H /home/shared/servers/hacknode1/rapid-env
+    directory=/home/shared/servers/hacknode1/app
+    autostart=true
+    autorestart=true
+    stdout_logfile=/home/shared/logs/hacknode1.log
+    redirect_stderr=true
+    stopsignal=QUIT
+
+
+nginx
+-----
+
+nginx is the most lightweight web server available.
+
+Built to support highly concurrent workloads (e.g. 10,000 concurrents).
+
+Simple configuration system.
+
+Python integration outsourced to uwsgi.
+
+nginx config
+------------
+
+Lives in ``/etc/nginx/sites-enabled/hacknode1``:
+
+.. sourcecode:: nginx
+
+    server {
+        listen 80;
+        server_name hacknode1.alephpoint.com;
+        location / {
+            try_files $uri @hacknode1;
+        }
+        location @hacknode1 {
+            include uwsgi_params;
+            # notice: same socket from uwsgi command
+            uwsgi_pass unix:/tmp/uwsgi-hacknode1.sock;
+        }
+    }
 
 Lightweight Deployment Stack Overview
 -------------------------------------
 
-TODO
+.. sourcecode:: text
+
+    Web Request
+        --> nginx
+            --> supervisor
+                --> uwsgi
+                    --> Flask
+                        Your Application Code
+
+Y SO MANY LAYERS?
+
+Layers of Deployment Stack
+--------------------------
+
+Lightweight means "right tool for the job", and in this case:
+
+    * nginx only knows about serving and proxying HTTP requests
+    * supervisor only knows about managing long-lived processes
+    * uwsgi only knows about forwarding HTTP requests to WSGI app servers
+    * Flask is an app server
+
+So, there may be a lot of layers, but each piece is small and well-understood.
 
 hacknode Team Setup Overview
 ----------------------------
 
-TODO
+For our team development benefit, I've already configured our hacknode server
+with this nginx, supervisor, and uwsgi setup (yay sysadmin!)
+
+There are nine identical setups, ``hacknode{1-9}``:
+
+.. sourcecode:: jinja
+
+    {% for num in range(1, 10) %}
+        {% set team_name = "hacknode" + num %}
+        mkdir /home/shared/servers/{{ team_name}};
+        make_nginx_config {{ team_name }};
+        make_supervisor_config {{ team_name }};
+        start_service {{ team_name }};
+    {% endfor %}
+
+(not actual code, but it's what I did, roughly)
 
 Small fabfile changes
 ---------------------
 
-TODO
+.. sourcecode:: python
 
-Running prod
-------------
+    TEAM_NAME = "hacknode2"
 
-TODO
+    # ...
 
-Onward to Databases
--------------------
+    @task
+    def setup_virtualenv():
+        """Set up virtualenv on remote machine."""
+        with cd("servers/" + TEAM_NAME): # <-- changed
+            run("virtualenv rapid-env")
+            virtualenv_run("pip install -r requirements.txt")
 
-Various database types:
+    @task
+    def deploy():
+        """Deploy project remotely ."""
+        run("mkdir -p servers") # <-- changed
+        rsync_project(remote_dir="servers/" + TEAM_NAME, # <-- changed
+                      local_dir="./",
+                      exclude=(".git", "rapid-env", "steps", "activate"))
+
+Set up prod
+-----------
+
+First, we set up the deployment directory.
+
+.. sourcecode:: sh
+
+    $ fab setup_virtualenv
+    ...
+    $ fab deploy
+    ...
+
+We should now have ``/home/shared/servers/hacknode2/app/app.py`` for the app.
+
+We should also have ``/home/shared/servers/hacknode2/rapid-env`` for the env.
+
+Add restarter to fabfile
+------------------------
+
+.. sourcecode:: python
+
+    def supervisor_run(cmd):
+        sudo("supervisorctl {}".format(cmd), shell=False)
+
+    @task
+    def restart():
+        """Restart supervisor service and view some output of log file."""
+        supervisor_run("restart {}".format(TEAM_NAME))
+        run("sleep 1")
+        supervisor_run("tail -800 {}".format(TEAM_NAME))
+
+Run prod
+--------
+
+.. sourcecode:: text
+
+    $ fab restart
+    [shared@hacknode] Executing task 'restart'
+    [shared@hacknode] sudo: supervisorctl restart hacknode1
+    [shared@hacknode] out: hacknode1: stopped
+    [shared@hacknode] out: hacknode1: started
+    # ...
+    [shared@hacknode] sudo: supervisorctl tail -800 hacknode1
+    # ...
+    [shared@hacknode] out: uwsgi socket 0 bound to UNIX address /tmp/uwsgi-hacknode1.sock fd 3
+    [shared@hacknode] out: Python version: 2.7.3 (default, Apr 20 2012, 23:04:22)  [GCC 4.6.3]
+    [shared@hacknode] out: Set PythonHome to /home/shared/servers/hacknode1/rapid-env
+    [shared@hacknode] out: Python main interpreter initialized at 0x1f06940
+    [shared@hacknode] out: your server socket listen backlog is limited to 100 connections
+    [shared@hacknode] out: *** Operational MODE: single process ***
+    [shared@hacknode] out: WSGI application 0 (mountpoint='') ready on interpreter 0x1f06940 pid: 6265 (default app)
+    [shared@hacknode] out: *** uWSGI is running in multiple interpreter mode ***
+    [shared@hacknode] out: spawned uWSGI worker 1 (and the only) (pid: 6265, cores: 1)
+    # ...
+
+Onward to Databases!
+--------------------
+
+Now that we have our web prototype, and a place where we can run our server in
+production, the last piece that is necessary is to think about where to put our
+glorious datas.
+
+There are various database types:
 
     * SQL
     * NoSQL
     * Search
     * Dynamo
 
-Even within these types, multiple database styles!
+Database Styles
+---------------
+
+Even within these types, there are multiple database styles!
 
     * Schema vs Schema-less
     * Distributed vs Single-Node
     * Dev-friendly vs Sysadmin friendly
 
-Let's try to sort through the madness.
+We'll do a quick "speed dating" right now.
 
 NoSQL: Redis
 ------------
@@ -2471,40 +2674,158 @@ Good for: large-scale search use cases, e.g. searching the Twitter firehose.
 Dynamo: Cassandra and Riak
 --------------------------
 
-TODO
+Just don't worry about these databases.
+
+They are for "big data" use cases that are way beyond the needs of your prototype.
+
+They are part of the "upgrade path" for really big apps like Facebook,
+Advertising Systems, Finance Applications, etc.
 
 Picking One: MongoDB
 --------------------
 
-TODO
+Why MongoDB?
+
+.. class:: incremental
+
+    * Doesn't require me to teach you anything about SQL -- "documents" are an
+    intuitive and even Python-friendly concept.
+
+    * Awesome developer experience: you install it, and with zero
+    configuration, you're basically ready to store data.
+
+    * pymongo driver lets you use Python dictionaries as MongoDB documents:
+    simple!
+
+    * mongo "shell" is actually a JavaScript shell.
+
+    * Scales pretty well. We even use it for a lot of our production data at
+    Parse.ly for its performance benefits!
 
 Installing MongoDB
 ------------------
 
-TODO
+There are pretty straightforward instructions for every operating system at:
+
+http://mongodb.org/downloads
+
+But I have also pre-installed it on our ``hacknode`` server to save us some time!
 
 Storing our first datum
 -----------------------
 
-TODO
+.. sourcecode:: text
+
+    $ ssh shared@hacknode
+    ...
+    $ mongo
+    ...
+    > use hacknode1
+    switched to db hacknode1
+    > db.articles.insert({"title": "Google", "link": "http://google.com"})
+    > db.articles.find().pretty()
+    {
+            "_id" : ObjectId("51277ff21aba565f2bc54c5e"),
+            "title" : "Google",
+            "link" : "http://google.com"
+    }
 
 Using pymongo
 -------------
 
-TODO
+.. sourcecode:: python
+
+    >>> import pymongo
+    >>> pymongo.MongoClient()
+    MongoClient('localhost', 27017)
+    >>> client = pymongo.MongoClient()
+    >>> client.hacknode1
+    Database(MongoClient('localhost', 27017), u'hacknode1')
+    >>> client.hacknode1.articles
+    Collection(Database(MongoClient('localhost', 27017), u'hacknode1'), u'articles')
+    >>> coll = client.hacknode1.articles
+    >>> coll.find()
+    <pymongo.cursor.Cursor at 0x2b1b350>
+    >>> list(coll.find())
+    [{u'_id': ObjectId('51277ff21aba565f2bc54c5e'),
+    u'link': u'http://google.com',
+    u'title': u'Google'}]
 
 MongoDB query module
 --------------------
 
-TODO
+.. sourcecode:: python
 
-Layered Architecture Review
----------------------------
+    from pymongo import MongoClient
 
-TODO
+    TEAM_NAME = "hacknode1"
 
-Shipping It!
-------------
+    def get_collection():
+        return MongoClient()[TEAM_NAME].articles 
+
+MongoDB instrumentation for insert_article
+------------------------------------------
+
+.. sourcecode:: python
+
+    def insert_article(article):
+        coll = get_collection()
+        article["score"] = 0
+        article["date"] = dt.datetime.now()
+        print "Inserting ->", article
+        coll.insert(article)
+        return True
+
+Handling Submit "Explicit Upvoting"
+----------------------------------
+
+.. sourcecode:: python
+
+    def insert_article(article):
+        coll = get_collection()
+        existing = coll.find_one({"link": article["link"]})
+        if existing is not None:
+            print "Found existing, explicit upvoting ->", existing
+            coll.update({"link": existing["link"]},
+                        {"$inc":
+                            {"score": 5}
+                        })
+            return True
+        else:
+            article["score"] = 0
+            article["date"] = dt.datetime.now()
+            print "Inserting ->", article
+            coll.insert(article)
+            return True
+
+Handling Click "Implicit Upvoting"
+----------------------------------
+
+.. sourcecode:: python
+
+    def track_click(url):
+        coll = get_collection()
+        print "Tracking ->", url
+        coll.update({"link": url}, 
+                    {"$inc": 
+                        {"score": 1}
+                    })
+        return True
+
+Handling "Basic" Search
+-----------------------
+
+.. sourcecode:: python
+
+    def search_articles(query):
+        print "Searching ->", query
+        articles = coll.find({"title": 
+                                {"$regex": query}
+                             })
+        return list(articles)
+
+Architecture Review
+-------------------
 
 TODO
 
