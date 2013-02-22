@@ -57,16 +57,30 @@ Repo setup
 Clone the code respository::
 
     git clone git@github.com:amontalenti/rapid-web.git
+    
+Read-only is also OK::
+
+    git clone git://github.com/amontalenti/rapid-web.git
 
 Inspect the tags::
 
     git tag -l
 
-Look at `Github web interface`_.
+Look at `Github web interface`_. Feel free to fork!
 
 .. _Github web interface: https://github.com/amontalenti/rapid-web/
 
-Feel free to fork!
+virtualenv pre-reqs
+-------------------
+
+``easy_install`` command may not be available in some borked Python versions.
+
+Try `easy_install --version` to check.
+
+If not available, use this script::
+
+    curl -O http://python-distribute.org/distribute_setup.py
+    python distribute_setup.py
 
 Set up virtualenv
 -----------------
@@ -76,7 +90,7 @@ Run the virtualenv setup script::
     cd rapid-web
     sh steps/01_init.sh
 
-You should then have a virtualenv folder called `rapid-env`.
+You should then have a virtualenv folder called ``rapid-env``.
 Activate it and install IPython::
 
     $ source rapid-env/bin/activate
