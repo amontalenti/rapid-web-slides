@@ -2,7 +2,7 @@
 /* Following are the presentation styles -- edit away! */
 
 html, body {margin: 0; padding: 0;}
-body {background: black; color: white;}
+body {background: black; color: white; font-family: "Helvetica", "Arial", "Times New Roman";}
 :link, :visited {text-decoration: none; color: cyan;}
 #controls :active {color: #888 !important;}
 #controls :focus {outline: 1px dotted #CCC;}
@@ -58,7 +58,7 @@ html>body .external {border-bottom: none;}
 .external:after {content: " \274F"; font-size: smaller; color: #FCC;}
 
 .incremental, .incremental *, .incremental *:after {
-  color: black; visibility: visible; border: 0;}
+  color: gray; visibility: visible; border: 0;}
 img.incremental {visibility: hidden;}
 .slide .current {color: lime;}
 
