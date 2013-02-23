@@ -44,23 +44,95 @@ Parse.ly
 
 What do we do?
 
+OS Preliminaries: Windows
+-------------------------
+
+One of the most annoying things of development is that not all PCs have decent
+development environments pre-installed.
+
+In particular, the dominant OS, Windows, has a piss-poor development
+environment by default.
+
+To work around this, for Windows, I'll require you to install `PuTTY`_ and
+connect to a server I've set up for you. This means you'll be using a terminal
+(``bash``) and simple text editor (``nano``), but it'll do you some good.
+
+.. _PuTTY: http://the.earth.li/~sgtatham/putty/latest/x86/putty-0.62-installer.exe
+
+User Accounts on HackNode
+-------------------------
+
+My HackNode server is set up with some user accounts, e.g.::
+
+    host: hacknode1.alephpoint.com
+    port: 22
+    login as: user1
+    password: *******
+
+PuTTY can set up a profile for these and connect easily.
+
+Once in, you'll have an empty home directory to play with, and ``python`` and
+``git`` will be installed.
+
+OS Preliminaries: OS X
+----------------------
+
+Mac OS X is slightly better than Windows. You have a terminal application,
+``Terminal.app``, and under the hood, OS X is actually UNIX.
+
+All you need is a recent version of ``git`` and ``python``.
+
+A recent Python version (2.7.3) can be installed from `Python.org`_.
+
+A recent Git version (1.8.1) can be downloaded from `git-scm.com`_.
+
+.. _Python.org: http://python.org/download/
+.. _git-scm.com: http://git-scm.com/download
+
+OS Preliminaries: Linux
+-----------------------
+
+Linux is the easiest of all for development. Simply install ``python`` and
+``git`` from your system's package manager (e.g. for Ubuntu/Debian, ``apt-get
+install git python``).
+
+A good terminal should be bundled with your system (e.g.  ``gnome-terminal`` or
+``konsole``).
+
 System Preliminaries
 --------------------
 
-Run `python -V` and make sure you're on Python 2.7.x.
+Open terminal (whether PuTTY to server, Terminal.app, or Linux terminal) and...
 
-Run `git --version` to make sure you have git installed.
+run `python -V` and make sure you're on Python 2.7.x.
+
+run `git --version` to make sure you have git installed.
+
+UNIX basics
+-----------
+
+This course assumes you can walk around the command line a bit.
+
+A quick cheat sheet:
+
+    * ``ls``: list files in current directory
+    * ``pwd``: print working directory path
+    * ``cd <path>``: change directory
+    * ``mkdir <path>``: create a directory
+    * ``cat <file>``: show contents of file
+    * ``nano <file>``: open file in nano text editor
 
 Repo setup
 ----------
 
+Make a work area::
+
+    mkdir ~/repos
+
 Clone the code respository::
 
-    git clone git@github.com:amontalenti/rapid-web.git
-    
-Read-only is also OK::
-
     git clone git://github.com/amontalenti/rapid-web.git
+    cd rapid-web
 
 Inspect the tags::
 
@@ -73,7 +145,8 @@ Look at `Github web interface`_. Feel free to fork!
 virtualenv pre-reqs
 -------------------
 
-``easy_install`` command may not be available in some borked Python versions.
+``easy_install`` command may not be available in some borked Python versions on
+Linux and OS X. (For PuTTY, I've taken care of it.)
 
 Try `easy_install --version` to check.
 
@@ -85,19 +158,104 @@ If not available, use this script::
 Set up virtualenv
 -----------------
 
-Run the virtualenv setup script::
+On OS X and Linux, run this virtualenv setup::
 
-    cd rapid-web
-    sh steps/01_init.sh
+    $ sudo easy_install pip
+    $ sudo pip install virtualenv
 
-You should then have a virtualenv folder called ``rapid-env``.
-Activate it and install IPython::
+Then::
 
-    $ source rapid-env/bin/activate
+    $ cd rapid-web
+    $ virtualenv rapid-env
+
+This will create a self-contained Python installation for use with this
+tutorial.
+
+IPython
+-------
+
+One of the first Python development tools I'll use in hour 2 is IPython.
+
+It lets us test code at the command-line easily.
+
+Prototyping code at the command-line is one of the core ways to do effective 
+prototyping beyond the HTML / CSS / JavaScript phase.
+
+IPython Setup
+-------------
+
+You should now have a virtualenv folder called ``rapid-env``. For convenience,
+let's make it easy to activate::
+
+    $ ln -s rapid-env/bin/activate
+
+Activate it with the "magic incantation"::
+
+    $ source activate
+
+And then, install IPython::
+
     (rapid-env)$ pip install ipython
-    ...
+    ... lots of output ...
     (rapid-env)$ ipython -V
     0.13.1
+
+Text Editor on PuTTY
+--------------------
+
+On the hosted environment via PuTTY, we're going to use ``nano``.
+
+It's the world's simplest terminal text editor (trust me).
+
+Help is displayed at the bottom, with keystroke commands. For example::
+
+    ^G Get Help     ^O WriteOut
+    ^X Exit
+
+Meaning: To get help, press CTRL+G. To exit, press CTRL+X. To write the current
+file (save), press CTRL+O.
+
+You can get by with these three commands alone.
+
+Text Editor on OS X
+-------------------
+
+On OS X, you could also use ``nano``.
+
+I also hear a lot of good things about `TextMate`_ and `SublimeText`_. 
+
+I'll link to these here, but I'm not a huge fan of closed-source text editors,
+so I won't cover them in any detail.
+
+.. _TextMate: http://macromates.com/
+.. _SublimeText: http://www.sublimetext.com/2
+
+Text Editor on Linux
+--------------------
+
+Linux has a lot of good text editor options (perhaps, too many). As with all the others, 
+you can also stick with ``nano`` if you're in the early stages of programming. 
+
+Chances that you are running Linux and don't know much about programming: slim.
+
+For simple interactive text editors, ``gedit`` and ``kate`` are great choices.
+
+Great Cross-Platform Option: Komodo Edit
+----------------------------------------
+
+`Komodo Edit`_ is free (as in beer) and Free (as in speech), and works on every platform.
+
+The top UI prototyper at Parse.ly swears by it.
+
+It's developed in the open at the `Open Komodo`_ project. Seems like another great choice.
+
+.. _Komodo Edit: http://www.activestate.com/komodo-edit
+.. _Open Komodo: http://www.openkomodo.com/
+
+No More Preliminaries!
+----------------------
+
+On to the main course!
 
 Rapid Web Prototyping
 ---------------------
@@ -214,6 +372,12 @@ Premature Optimization
 
     Don't start to build the backend of your web app until you've determined
     what user experience your application will enable.
+
+Discussion: Is This Fair?
+-------------------------
+
+Do you think backends deserve to be built first? I'd like opinions from the
+class!
 
 Fake It Till We Make It
 -----------------------
@@ -383,6 +547,69 @@ Static HTML
             <script src="js/main.js"></script>
         </body>
     </html>
+
+HTML for Prototypers
+--------------------
+
+An HTML document is like a little "envelope for your site."
+
+In ``<head>``, you describe the document itself. The ``<title>`` of the document,
+some metadata about the document, and links to relevant to stylesheets (CSS).
+
+In the ``<body>``, you put the "main entree": the content itself, or the site structural
+elements.
+
+At the bottom of the ``<body>``, you install ``<script>`` tags for any JavaScript you 
+want to make the page behave in a dynamic way.
+
+HTML Element Flow
+-----------------
+
+There are a few core HTML elements that our framework will use (and we'll
+describe later), but you should know a couple things about HTML / CSS first.
+
+First, any element can have a name (``id``) and any number of styles
+(``class``). This will be important later.
+
+.. sourcecode:: html
+
+    <div id="container" class="on">
+    Rapid Web <span id="course" class="smallcaps">Prototyping</span>
+    </div>
+
+Second, though there are many kinds of elements for different browser interface
+components, there are two special kinds of HTML elements with nearly limitless
+flexibility: ``<div>`` and ``<span>``.
+
+div element
+-----------
+
+The ``div`` element creates a "block" element, which means, it is sized like a rectangle
+inside the browser.
+
+Used to mark off "divisions" of your site page, e.g. distinguish a "header
+area" from the "content area" from the "footer area".
+
+``div`` elements can contain other ``div`` elements, creating a parent/child site structure.
+
+span element
+------------
+
+The ``span`` tag creates an "inline" element, which means, it's used to wrap
+around text and images.
+
+This is typically used for things like labels, in-text annotations, captions, etc.
+
+Importantly, a ``span`` cannot contain a block element (like a ``div``), but can be 
+*contained by* one.
+
+div and span
+------------
+
+On their own, div and span are "meaningless containers" other than the above description.
+
+They are therefore typically the tool used for all your CSS styling. And with
+the framework we are using, they are relied upon heavily, as well.
 
 jQuery / Bootstrap Intro
 ------------------------
@@ -2070,8 +2297,7 @@ Let's take a 5m break to answer questions / reflect a bit.
 Server Setup
 ------------
 
-So far, all of our development has been "local" -- namely, you do all your work
-directly on your development workstation.
+So far, all of our development has been "local".
 
 This has lots of benefits:
 
@@ -2131,6 +2357,18 @@ Our Rackspace Nextgen Cloud Server.
 * Public IP: 166.78.109.8
 * Private IP: 10.177.128.157
 
+SSH for PuTTY Users?
+--------------------
+
+Well, you're already on ``hacknode``!
+
+Therefore, all the following "SSH setup" stuff will feel slightly strange.
+
+In your case, you will be "deploying" to the same server you're "developing"
+on. You'll think, "what's the point?" Well, once you have a good local UNIX
+environment (e.g. via Virtualbox or VMWare), you'll need to follow similar
+steps.
+
 Access via SSH
 --------------
 
@@ -2142,7 +2380,16 @@ Access via SSH
 
     This has the side benefit of obviating the need for password entry at the command-line.
 
-    (Github uses this same trick for Git access.)
+    (Github uses this same trick for read+write Git access.)
+
+"shared" user account 
+---------------------
+
+In the case of hacknode, I've created a non-root account called ``shared``
+which will be shared by every person in the class.
+
+We'll add your public keys to this account, and you'll do your deployments in its 
+home directory (``/home/shared``).
 
 Control via SSH
 ---------------
@@ -2168,6 +2415,59 @@ SSH Config
 
     This private key has a matching public key, which is typically ``~/.ssh/id_rsa.pub``
     and must be listed in the remote host's ``~/.ssh/authorized_keys`` file.
+
+    ``ssh-keygen`` can create the public/private key for you. Then you need to
+    share the public key with me.
+
+ssh-keygen
+----------
+
+.. sourcecode:: text
+
+    $ ssh-keygen 
+    Generating public/private rsa key pair.
+    Enter file in which to save the key (/home/user1/.ssh/id_rsa): 
+    Your identification has been saved in /home/user1/.ssh/id_rsa.
+    Your public key has been saved in /home/user1/.ssh/id_rsa.pub.
+    The key fingerprint is:
+    43:55:f0:cc:1a:9f:ff:2e:3a:a8:94:8c:f1:62:d3:b1 user1@hacknode
+    The key's randomart image is:
+    +--[ RSA 2048]----+
+    |          oo.    |
+    |         . +     |
+    |        . . +    |
+    |       .   + .   |
+    |      . S . o    |
+    |       * =   .   |
+    |      = E  .  .  |
+    |     . +  . . .. |
+    |        ..  .o oo|
+    +-----------------+
+
+.ssh/config example
+-------------------
+
+Edit the file:
+
+.. sourcecode:: sh
+
+    $ nano ~/.ssh/config
+
+And insert contents:
+
+.. sourcecode:: text
+
+    Host hacknode
+        User shared
+        HostName 166.78.109.8
+
+Then:
+
+.. sourcecode:: sh
+
+    $ ssh hacknode
+    ... lots of output ...
+    shared@hacknode$ _
 
 Introducing Fabric
 ------------------
@@ -2212,6 +2512,7 @@ This will help us with deployment later.
     from flask.ext.script import Manager
 
     app = Flask(...)
+    app.debug = True
     manager = Manager(app)
 
     if __name__ == "__main__":
@@ -2584,6 +2885,11 @@ Run prod
     [shared@hacknode] out: *** uWSGI is running in multiple interpreter mode ***
     [shared@hacknode] out: spawned uWSGI worker 1 (and the only) (pid: 6265, cores: 1)
     # ...
+
+Yay! Shipped!
+-------------
+
+5m discussion to review what we've learned.
 
 Onward to Databases!
 --------------------
@@ -2960,6 +3266,52 @@ You've learned a lot!
     in record time.
 
     Web development isn't magic! It's just putting a few pieces together.
+
+Your New Lightweight Web Dev Stack (1)
+--------------------------------------
+
+.. class:: big
+
+    Building a Fake
+
+.. class:: incremental
+
+    HTML, CSS, and JavaScript for static clickables, enhanced by Bootstrap and jQuery.
+
+    Python ``SimpleHTTPServer`` and/or ``livereload`` for prototyping the UI.
+
+    Fake a backend using public JSON-P services or local .json files as necessary.
+
+
+Your New Lightweight Web Dev Stack (2)
+--------------------------------------
+
+.. class:: big
+
+    Getting Real
+
+.. class:: incremental
+
+    Build a local web application with Flask and design your URL routes.
+
+    Convert your static clickables to Jinja2 templates.
+    
+    Use Macros and Filters for code duplication on the front-end.
+
+Your New Lightweight Web Dev Stack (3)
+--------------------------------------
+
+.. class:: big
+
+    Shipping It
+
+.. class:: incremental
+
+    Set up a remote server in the cloud, e.g. Rackspace Cloud.
+
+    Use Fabric to deploy your code to nginx, uwsgi, and supervisor.
+
+    Store your first "real" data with MongoDB.
 
 Questions?
 ----------
