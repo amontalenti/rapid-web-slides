@@ -1648,14 +1648,14 @@ Bottom Line on Client vs Server
 
 .. class:: incremental
 
-    * All user data must be validated server-side. Optionally, can "convenience
-      check" on client side.
+    All user data must be validated server-side. Optionally, can "convenience
+    check" on client side.
 
-    * JavaScript code must run under the "hostile environment" assumption that
-      an attacker can change any aspect of DOM, functions, classes, etc.
+    JavaScript code must run under the "hostile environment" assumption that an
+    attacker can change any aspect of DOM, functions, classes, etc.
 
-    * Where dynamism is needed, it's preferable to do HTTP/JSON requests to
-      server via XMLHTTPRequest or JSON-P.
+    Where dynamism is needed, it's preferable to do HTTP/JSON requests to
+    server via XMLHTTPRequest or JSON-P.
 
 HTML Forms for Server Interaction
 ---------------------------------
