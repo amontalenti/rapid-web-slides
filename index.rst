@@ -44,43 +44,44 @@ Parse.ly
 
 What do we do?
 
-OS Preliminaries: Windows
--------------------------
+Requirements
+------------
 
-One of the most annoying things of development is that not all PCs have decent
-development environments pre-installed.
+The main requirements for this course are:
 
-In particular, the dominant OS, Windows, has a piss-poor development
-environment by default.
+* Python 2.7.x
+* Git 1.7/1.8
+* virtualenv (described elsewhere)
+* basic UNIX shell usage (e.g. bash, zsh)
+* basic programming text editor usage (e.g. TextMate/SublimeText, emacs/vim, Komodo)
+* a UNIX-like operating system (OS X, Linux VM, or Linux on raw hardware)
 
-To work around this, for Windows, I'll require you to install `PuTTY`_ and
-connect to a server I've set up for you. This means you'll be using a terminal
-(``bash``) and simple text editor (``nano``), but it'll do you some good.
+Already done with these steps? `Skip ahead!`_
 
-.. _PuTTY: http://the.earth.li/~sgtatham/putty/latest/x86/putty-0.62-installer.exe
+.. _Skip ahead!: #rapid-web-prototyping
 
-User Accounts on HackNode
--------------------------
+Programming Newbies: Beginner Track
+-----------------------------------
 
-My HackNode server is set up with some user accounts, e.g.::
+If you aren't familiar with the command-line, programming text editors, UNIX, and/or don't have a good comfort level with basic usage of Python/Git already, then you can take the "beginner track" in this course.
 
-    host: hacknode1.alephpoint.com
-    port: 22
-    login as: user1
-    password: *******
+Rather than setting up your local computer, you will simply follow along what I'm doing on the screen, and optionally connect to a server I have set up where you can experiment with an IPython Notebook and CodeMirror HTML Editor.
 
-PuTTY can set up a profile for these and connect easily.
+You can also download the code to follow along:
 
-Once in, you'll have an empty home directory to play with, and ``python`` and
-``git`` will be installed.
+http://pixelmonkey.org/pub/rapid-web-code.zip
 
-OS Preliminaries: OS X
-----------------------
+Is my OS already set up?
+------------------------
 
-Mac OS X is slightly better than Windows. You have a terminal application,
-``Terminal.app``, and under the hood, OS X is actually UNIX.
+Open terminal and...
 
-All you need is a recent version of ``git`` and ``python``.
+run `python -V` and make sure you're on Python 2.7.x.
+
+run `git --version` to make sure you have git 1.7/1.8 installed.
+
+Python / Git Setup
+------------------
 
 A recent Python version (2.7.3) can be installed from `Python.org`_.
 
@@ -88,25 +89,6 @@ A recent Git version (1.8.1) can be downloaded from `git-scm.com`_.
 
 .. _Python.org: http://python.org/download/
 .. _git-scm.com: http://git-scm.com/download
-
-OS Preliminaries: Linux
------------------------
-
-Linux is the easiest of all for development. Simply install ``python`` and
-``git`` from your system's package manager (e.g. for Ubuntu/Debian, ``apt-get
-install git python``).
-
-A good terminal should be bundled with your system (e.g.  ``gnome-terminal`` or
-``konsole``).
-
-System Preliminaries
---------------------
-
-Open terminal (whether PuTTY to server, Terminal.app, or Linux terminal) and...
-
-run `python -V` and make sure you're on Python 2.7.x.
-
-run `git --version` to make sure you have git installed.
 
 UNIX basics
 -----------
@@ -142,11 +124,18 @@ Look at `Github web interface`_. Feel free to fork!
 
 .. _Github web interface: https://github.com/amontalenti/rapid-web/
 
+Browse all the additions
+------------------------
+
+All the changes from the initial check-in to the last on Github.
+
+https://github.com/amontalenti/rapid-web/compare/v0.2-static...v2.0-fin
+
 virtualenv pre-reqs
 -------------------
 
 ``easy_install`` command may not be available in some borked Python versions on
-Linux and OS X. (For PuTTY, I've taken care of it.)
+Linux and OS X.
 
 Try `easy_install --version` to check.
 
@@ -158,7 +147,7 @@ If not available, use this script::
 Set up virtualenv
 -----------------
 
-On OS X and Linux, run this virtualenv setup::
+Run this virtualenv setup::
 
     $ sudo easy_install pip
     $ sudo pip install virtualenv
@@ -200,57 +189,126 @@ And then, install IPython::
     (rapid-env)$ ipython -V
     0.13.1
 
-Text Editor on PuTTY
+IPython and Flask installation
+------------------------------
+
+Install the requirements with ``pip``::
+
+    $ cat requirements.txt
+    ipython
+    Flask
+    $ pip install -r requirements.txt
+    ...
+
+Then, confirm that you can import all the libraries::
+
+    $ ipython
+    >>> import flask
+    >>> import jinja2
+    >>> import werkzeug
+    >>> <CTRL+D>
+    Do you really want to exit ([y]/n)? y
+    $
+
+Advanced Prototyping
 --------------------
 
-On the hosted environment via PuTTY, we're going to use ``nano``.
+If you install some optional requirements, you can get:
 
-It's the world's simplest terminal text editor (trust me).
+* IPython Notebook: browser-based Python editor and prototyping environment
+* LiveReload: browser plugin and server for auto reloading on page changes
 
-Help is displayed at the bottom, with keystroke commands. For example::
+IPython Notebook and LiveReload Installation
+--------------------------------------------
 
-    ^G Get Help     ^O WriteOut
-    ^X Exit
+These are in ``dev-requirements.txt``, which you can install with ``pip``::
 
-Meaning: To get help, press CTRL+G. To exit, press CTRL+X. To write the current
-file (save), press CTRL+O.
+    $ cat dev-requirements.txt
+    # for live code updates
+    livereload
+    # for ipython notebook
+    tornado
+    pyzmq
+    $ pip install -r dev-requirements.txt
+    ...
+    $ ipython notebook
+    <CTRL+C to quit>
+    $ livereload -p 8000
+    <CTRL+C to quit>
 
-You can get by with these three commands alone.
+SSH Config
+----------
 
-Text Editor on OS X
+We're going to ssh into a remote server in the final hour of the course for
+deployment.
+
+To do this, we're going to need to add your public key to the server's list of
+"authorized keys".
+
+If you are already a Github user or remotely manage servers with SSH, then you
+probably don't need to generate a new public key, but I've included these
+instructions here for those of you who don't already have public keys.
+
+Do I have a public key?
+-----------------------
+
+Try::
+
+    cat ~/.ssh/id_*.pub
+
+Do you get output like::
+
+    ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQE...
+
+If so, you do already have a public key.
+
+SSH Public Key Setup
+--------------------
+
+SSH has a small configuration file at ``~/.ssh/config`` that allows you to
+specify hostnames that ssh will use.
+
+Upon connecting to a server, ssh looks for an identity file for public key
+authentication. This is typically ``~/.ssh/id_rsa``.
+
+This private key has a matching public key, which is typically ``~/.ssh/id_rsa.pub``
+and must be listed in the remote host's ``~/.ssh/authorized_keys`` file.
+
+``ssh-keygen`` can create the public/private key for you. Then you need to
+share the public key with me.
+
+ssh-keygen
+----------
+
+.. sourcecode:: text
+
+    $ ssh-keygen 
+    Generating public/private rsa key pair.
+    Enter file in which to save the key (/home/user1/.ssh/id_rsa): 
+    Your identification has been saved in /home/user1/.ssh/id_rsa.
+    Your public key has been saved in /home/user1/.ssh/id_rsa.pub.
+    The key fingerprint is:
+    43:55:f0:cc:1a:9f:ff:2e:3a:a8:94:8c:f1:62:d3:b1 user1@hacknode
+    ...
+
+.ssh/config example
 -------------------
 
-On OS X, you could also use ``nano``.
+Edit the file::
 
-I also hear a lot of good things about `TextMate`_ and `SublimeText`_. 
+    $ nano ~/.ssh/config
 
-I'll link to these here, but I'm not a huge fan of closed-source text editors,
-so I won't cover them in any detail.
+And insert contents::
 
-.. _TextMate: http://macromates.com/
-.. _SublimeText: http://www.sublimetext.com/2
+    Host hacknode
+        User shared
+        HostName hacknode.alephpoint.com
 
-Text Editor on Linux
---------------------
+Then::
 
-Linux has a lot of good text editor options (perhaps, too many). As with all the others, 
-you can also stick with ``nano`` if you're in the early stages of programming. 
+    $ ssh hacknode
 
-Chances that you are running Linux and don't know much about programming: slim.
-
-For simple interactive text editors, ``gedit`` and ``kate`` are great choices.
-
-Great Cross-Platform Option: Komodo Edit
-----------------------------------------
-
-`Komodo Edit`_ is free (as in beer) and Free (as in speech), and works on every platform.
-
-The top UI prototyper at Parse.ly swears by it.
-
-It's developed in the open at the `Open Komodo`_ project. Seems like another great choice.
-
-.. _Komodo Edit: http://www.activestate.com/komodo-edit
-.. _Open Komodo: http://www.openkomodo.com/
+It'll prompt you for a password right, but that's OK -- just CTRL+C to abort.
 
 No More Preliminaries!
 ----------------------
@@ -271,7 +329,6 @@ Most web developers lack this skill due to a number of biases:
 * Polyglot Complexity Bias
 
 Let's take each of these in turn.
-
 
 Computer Science Backend Bias
 -----------------------------
@@ -1072,50 +1129,6 @@ Onward to "Getting Real!"
 -------------------------
 
 Let's take a 5m break to answer questions / reflect a bit.
-
-IPython and Flask installation
-------------------------------
-
-.. sourcecode:: sh
-
-    $ cat requirements.txt
-    ipython
-    Flask
-    $ pip install -r requirements.txt
-    ...
-
-Then...
-
-.. sourcecode:: sh
-
-    $ ipython
-    >>> import flask
-    >>> flask.<TAB>
-    >>> import jinja2
-    >>> jinja2.<TAB>
-    >>> import werkzeug
-    >>> werkzeug.<TAB>
-
-Advanced Prototyping
---------------------
-
-If you install some optional requirements, you can get:
-
-* IPython Notebook: browser-based Python editor and prototyping environmnet
-* LiveReload: browser plugin and server for auto reloading on page changes
-
-.. sourcecode:: sh
-
-    $ cat dev-requirements
-    # for live code updates
-    livereload
-    # for ipython notebook
-    tornado
-    pyzmq
-    $ pip install -r dev-requirements.txt
-    ...
-    $ ipython notebook
-    $ livereload -p 8000
 
 Build a Web Server
 ------------------
@@ -2357,18 +2370,6 @@ Our Rackspace Nextgen Cloud Server.
 * Public IP: 166.78.109.8
 * Private IP: 10.177.128.157
 
-SSH for PuTTY Users?
---------------------
-
-Well, you're already on ``hacknode``!
-
-Therefore, all the following "SSH setup" stuff will feel slightly strange.
-
-In your case, you will be "deploying" to the same server you're "developing"
-on. You'll think, "what's the point?" Well, once you have a good local UNIX
-environment (e.g. via Virtualbox or VMWare), you'll need to follow similar
-steps.
-
 Access via SSH
 --------------
 
@@ -2401,73 +2402,6 @@ Control via SSH
     e.g. ``ssh hacknode ls /tmp`` will list the contents of the ``/tmp`` directory on the server.
 
     e.g. ``ssh hacknode ps aux`` will list all running processes on the server.
-
-SSH Config
-----------
-
-.. class:: incremental
-
-    SSH has a small configuration file at ``~/.ssh/config`` that allows you to
-    specify hostnames that ssh will use.
-
-    Upon connecting to a server, ssh looks for an identity file for public key
-    authentication. This is typically ``~/.ssh/id_rsa``.
-
-    This private key has a matching public key, which is typically ``~/.ssh/id_rsa.pub``
-    and must be listed in the remote host's ``~/.ssh/authorized_keys`` file.
-
-    ``ssh-keygen`` can create the public/private key for you. Then you need to
-    share the public key with me.
-
-ssh-keygen
-----------
-
-.. sourcecode:: text
-
-    $ ssh-keygen 
-    Generating public/private rsa key pair.
-    Enter file in which to save the key (/home/user1/.ssh/id_rsa): 
-    Your identification has been saved in /home/user1/.ssh/id_rsa.
-    Your public key has been saved in /home/user1/.ssh/id_rsa.pub.
-    The key fingerprint is:
-    43:55:f0:cc:1a:9f:ff:2e:3a:a8:94:8c:f1:62:d3:b1 user1@hacknode
-    The key's randomart image is:
-    +--[ RSA 2048]----+
-    |          oo.    |
-    |         . +     |
-    |        . . +    |
-    |       .   + .   |
-    |      . S . o    |
-    |       * =   .   |
-    |      = E  .  .  |
-    |     . +  . . .. |
-    |        ..  .o oo|
-    +-----------------+
-
-.ssh/config example
--------------------
-
-Edit the file:
-
-.. sourcecode:: sh
-
-    $ nano ~/.ssh/config
-
-And insert contents:
-
-.. sourcecode:: text
-
-    Host hacknode
-        User shared
-        HostName 166.78.109.8
-
-Then:
-
-.. sourcecode:: sh
-
-    $ ssh hacknode
-    ... lots of output ...
-    shared@hacknode$ _
 
 Introducing Fabric
 ------------------
