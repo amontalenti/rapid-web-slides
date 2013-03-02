@@ -49,6 +49,7 @@ Requirements
 
 The main requirements for this course are:
 
+* Google Chrome (recent version)
 * Python 2.7.x
 * Git 1.7/1.8
 * virtualenv (described elsewhere)
@@ -235,6 +236,13 @@ These are in ``dev-requirements.txt``, which you can install with ``pip``::
     <CTRL+C to quit>
     $ livereload -p 8000
     <CTRL+C to quit>
+
+LiveReload Chrome Plugin
+------------------------
+
+To actually use LiveReload, you need a browser extension for chrome which can be downloaded here:
+
+https://chrome.google.com/webstore/detail/livereload/jnihajbhpnppcggbcgedagnkighmdlei
 
 SSH Config
 ----------
