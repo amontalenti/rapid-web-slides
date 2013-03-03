@@ -4,7 +4,7 @@
 .slide, ul {page-break-inside: avoid; visibility: visible !important;}
 h1 {page-break-after: avoid;}
 
-body {font-size: 12pt; background: white;}
+body {font-size: 12pt; background: white; font-family: "Helvetica", "Arial", "Times New Roman";}
 * {color: black;}
 
 #slide0 h1 {font-size: 200%; border: none; margin: 0.5em 0 0.25em;}
