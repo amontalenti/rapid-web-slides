@@ -1059,8 +1059,8 @@ On main page:
 .. sourcecode:: html
 
     <ul class="nav">
-        <li><a href="#">Links</a></li>
-        <li class="active"><a href="/submit.html">Submit</a></li>
+        <li><a class="active" href="#">Links</a></li>
+        <li><a href="/submit.html">Submit</a></li>
     </ul>
 
 On submit page:
@@ -2375,7 +2375,8 @@ Our Rackspace Nextgen Cloud Server.
 * Disk: 20GB Attached
 * OS: Ubuntu 12.04 LTS
 * Location: Rackspace Chicago (ORD)
-* Public IP: 166.78.109.8
+* Host: hacknode.alephpoint.com
+* Public IP: 198.101.146.50
 * Private IP: 10.177.128.157
 
 Access via SSH
