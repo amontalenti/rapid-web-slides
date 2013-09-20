@@ -74,19 +74,17 @@ Hello, World! web app
 ---------------------
 
 Now, let's make a Hello, World web app just like it was suggested we do in the
-Quickstart guide above. Put this code into a file called ``hello.py``:
+Quickstart guide above. Put this code into a file called ``hello.py``::
 
-```python
-from flask import Flask
-app = Flask(__name__)
+    from flask import Flask
+    app = Flask(__name__)
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
+    @app.route('/')
+    def hello_world():
+        return 'Hello, World!'
 
-if __name__ == '__main__':
-    app.run()
-```
+    if __name__ == '__main__':
+        app.run()
 
 Now run the application using ``python hello.py``. You should see this output::
 
@@ -99,28 +97,26 @@ happening, e.g. the HTTP 200 status code.
 Adding a simple template
 ------------------------
 
-Now let's replace ``hello.py`` with these contents:
+Now let's replace ``hello.py`` with these contents::
 
-```python
-from flask import Flask, render_template
+    from flask import Flask, render_template
 
-app = Flask(__name__)
+    app = Flask(__name__)
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
+    @app.route('/')
+    def hello_world():
+        return 'Hello, World!'
 
-@app.route('/hello/')
-@app.route('/hello/<name>')
-def hello_world_template(name=None):
-    return render_template('hello.jinja2.html', name=name)
+    @app.route('/hello/')
+    @app.route('/hello/<name>')
+    def hello_world_template(name=None):
+        return render_template('hello.jinja2.html', name=name)
 
-def main():
-    app.run(debug=True)
+    def main():
+        app.run(debug=True)
 
-if __name__ == '__main__':
-    main()
-```
+    if __name__ == '__main__':
+        main()
 
 This example has our original ``hello_world`` function, that handles requests
 to ``/`` path. But we have also added a handler for two more path routes,
@@ -142,17 +138,15 @@ requests at the specified routes for your Flask application.
 So, from a high level, we are trying to make it so that if you enter
 ``/hello/John`` as a path, we will render a document that says "Hello, John!".
 We can achieve this goal with templates. So, let's also add a simple template
-in the ``templates/hello.jinja2.html`` file:
+in the ``templates/hello.jinja2.html`` file::
 
-```
-<!doctype html>
-<title>Hello, World custom example</title>
-{% if name %}
-    <h1>Hello {{ name }}!</h1>
-{% else %}
-    <h1>Hello, World!</h1>
-{% endif %}
-```
+    <!doctype html>
+    <title>Hello, World custom example</title>
+    {% if name %}
+        <h1>Hello {{ name }}!</h1>
+    {% else %}
+        <h1>Hello, World!</h1>
+    {% endif %}
 
 This illustrates the use of a basic `Jinja2 Control Structure`_, the if
 statement, though many others (that mostly match those available in Python) are
@@ -214,56 +208,52 @@ Integrate MongoDB with Flask
 Let's now add a new view to our controller to store arbitrary values in our
 MongoDB and list them from the DB using our template engine.
 
-Here's a new version of ``hello.py``:
+Here's a new version of ``hello.py``::
 
-```python
-from flask import Flask, render_template
-from pymongo import Connection
-from datetime import datetime
+    from flask import Flask, render_template
+    from pymongo import Connection
+    from datetime import datetime
 
-app = Flask(__name__)
-connection = Connection()
-db = connection.hello
+    app = Flask(__name__)
+    connection = Connection()
+    db = connection.hello
 
-@app.route('/')
-def hello_world():
-    return 'Hello, World!'
+    @app.route('/')
+    def hello_world():
+        return 'Hello, World!'
 
-@app.route('/hello/')
-@app.route('/hello/<name>')
-def hello_world_template(name=None):
-    return render_template('hello.jinja2.html', name=name)
+    @app.route('/hello/')
+    @app.route('/hello/<name>')
+    def hello_world_template(name=None):
+        return render_template('hello.jinja2.html', name=name)
 
-@app.route('/store/<value>')
-def store(value=None):
-    obj = {"value": value, "timestamp": datetime.now()}
-    db.values.insert(obj)
-    return "OK %r" % obj
+    @app.route('/store/<value>')
+    def store(value=None):
+        obj = {"value": value, "timestamp": datetime.now()}
+        db.values.insert(obj)
+        return "OK %r" % obj
 
-@app.route('/list/')
-def list():
-    records = db.values.find({})
-    return render_template('list.jinja2.html', records=records)
+    @app.route('/list/')
+    def list():
+        records = db.values.find({})
+        return render_template('list.jinja2.html', records=records)
 
-@app.route('/clear/')
-def clear():
-    db.values.remove()
-    return "OK"
+    @app.route('/clear/')
+    def clear():
+        db.values.remove()
+        return "OK"
 
-def main():
-    app.run(debug=True)
+    def main():
+        app.run(debug=True)
 
-if __name__ == '__main__':
-    main()
-```
+    if __name__ == '__main__':
+        main()
 
 We have two new module-level names, ``connection`` and ``db``. The first is the
 MongoDB connection, which is acquired once upon application startup. If your
-Flask application fails to start up with an error like this:
+Flask application fails to start up with an error like this::
 
-```
-pymongo.errors.AutoReconnect: could not connect to localhost:27017: [Errno 61] Connection refused
-```
+    pymongo.errors.AutoReconnect: could not connect to localhost:27017: [Errno 61] Connection refused
 
 ... this means that MongoDB is not running on your machine. This often means
 you need to run the ``mongod`` command or restart your UNIX service, e.g.
@@ -284,19 +274,17 @@ MongoDB collection called ``values``.
 Visiting ``/list/`` will use a template to render all objects currently in the
 ``values`` collection. Since MongoDB is a persistent database, these records
 will survive even server or database restarts. Here is the template you need
-for ``list/``; store it in ``templates/list.jinja2.html``:
+for ``list/``; store it in ``templates/list.jinja2.html``::
 
-```
-<!doctype html>
-<title>Listing values from DB...</title>
-<ol>
-{% for record in records %}
-  <li><strong>{{ record.value }}</strong>
-      <small>({{ record.timestamp }}, {{ record._id }})</small>
-  </li>
-{% endfor %}
-</ol>
-```
+    <!doctype html>
+    <title>Listing values from DB...</title>
+    <ol>
+    {% for record in records %}
+    <li><strong>{{ record.value }}</strong>
+        <small>({{ record.timestamp }}, {{ record._id }})</small>
+    </li>
+    {% endfor %}
+    </ol>
 
 Finally, ``/clear`` simply removes all records from the ``values`` collection.
 
