@@ -11,7 +11,6 @@ this information was spun out of one of my blog's most popular posts, ["How to b
 a web app fast: Python, HTML, and JavaScript resources"][origblog].
 
 [blog]: http://www.pixelmonkey.org/2013/03/13/rapid-web-prototyping-with-lightweight-tools
-It discusses:
 [origblog]: http://www.pixelmonkey.org/2012/06/14/web-app
 
 ## Outline
