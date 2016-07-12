@@ -1,8 +1,20 @@
 # Rapid Web Prototyping with Lightweight Tools
 
-This is a 3-hour tutorial I gave at PyCon 2013 in Santa Clara, CA.
+This is a [3-hour tutorial][tutorial] I gave at PyCon 2013 in Santa Clara, CA; a
+[video recording is also on YouTube][youtube].
 
+[tutorial]: https://us.pycon.org/2013/schedule/presentation/13/
+[youtube]: https://www.youtube.com/watch?v=muMRNYPmQxE
+
+This [blog post][blog] covers the tutorial and all the appropriate links in details, and 
+this information was spun out of one of my blog's most popular posts, ["How to build
+a web app fast: Python, HTML, and JavaScript resources"][origblog].
+
+[blog]: http://www.pixelmonkey.org/2013/03/13/rapid-web-prototyping-with-lightweight-tools
 It discusses:
+[origblog]: http://www.pixelmonkey.org/2012/06/14/web-app
+
+## Outline
 
 * why novice web devs tend to get overwhelmed by fancy frameworks
 * why rapid web prototyping is important, even for experienced devs
