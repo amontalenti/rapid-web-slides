@@ -6,7 +6,7 @@ This is a [3-hour tutorial][tutorial] I gave at PyCon 2013 in Santa Clara, CA; a
 [tutorial]: https://us.pycon.org/2013/schedule/presentation/13/
 [youtube]: https://www.youtube.com/watch?v=muMRNYPmQxE
 
-This [blog post][blog] covers the tutorial and all the appropriate links in details, and 
+This [blog post][blog] covers the tutorial and all the appropriate links in detail, and 
 this information was spun out of one of my blog's most popular posts, ["How to build
 a web app fast: Python, HTML, and JavaScript resources"][origblog].
 
